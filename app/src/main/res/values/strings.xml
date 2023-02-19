@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Catalogue App</string>
+    <string name="search">Search</string>
+    <string name="all">All</string>
+    <string name="folders">Folders</string>
+    <string name="add_btn">ADD</string>
+    <string name="file_path">File Path</string>
+    <string name="name">Name</string>
+    <string name="columns">Columns</string>
+    <string name="cover_image">Cover Image</string>
+    <string name="link_column">Link Column</string>
+    <string name="tags">Tags</string>
+    <string name="record">Record</string>
+    <string name="no_tags">No Tags</string>
+</resources>
