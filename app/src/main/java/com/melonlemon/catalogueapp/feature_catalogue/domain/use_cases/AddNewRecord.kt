@@ -1,13 +1,13 @@
 package com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases
 
+import com.melonlemon.catalogueapp.feature_catalogue.domain.model.RecordInfo
 import com.melonlemon.catalogueapp.feature_catalogue.domain.repository.CatalogueRepository
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.home.HomeScreenState
 
-class GetHomeScreenState(
+class AddNewRecord (
     repository: CatalogueRepository
 ) {
-    suspend operator fun invoke(): HomeScreenState{
+    suspend operator fun invoke(recordInfo: RecordInfo){
 
-        return HomeScreenState()
+
     }
 }

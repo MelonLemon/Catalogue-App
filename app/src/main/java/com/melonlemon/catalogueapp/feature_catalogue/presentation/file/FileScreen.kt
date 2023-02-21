@@ -8,24 +8,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.AddNewFolder
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.GetHomeScreenState
+import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.BackArrowRow
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.BasicButton
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SearchInput
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SmartCard
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.home.HomeScreenEvents
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.home.HomeViewModel
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,6 +30,11 @@ import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 fun FileScreen(
     viewModel: FileViewModel
 ) {
+    val searchText by viewModel.searchText.collectAsStateWithLifecycle()
+    val fileInfoState by viewModel.fileInfoState.collectAsStateWithLifecycle()
+    val forRecordsState by viewModel.forRecordsState.collectAsStateWithLifecycle()
+    val listOfRecords by viewModel.listOfRecords.collectAsStateWithLifecycle()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -57,11 +59,11 @@ fun FileScreen(
                 onArrowBackClick = {
                     // Navigation
                 },
-                title = stringResource(R.string.folders)
+                title = fileInfoState.title
             )
             SearchInput(
                 modifier = Modifier.fillMaxWidth(),
-                text = viewModel.fileScreenState.value.searchText,
+                text = searchText,
                 onTextChanged = { text ->
                     viewModel.fileScreenEvents(
                         FileScreenEvents.OnSearchTextChanged(text))
@@ -80,7 +82,7 @@ fun FileScreen(
                 item{
                     BasicButton(
                         text = stringResource(R.string.all),
-                        isSelected = viewModel.fileScreenState.value.isAllTagsSelected,
+                        isSelected = forRecordsState.isAllTagsSelected,
                         onButtonClicked = {
                             viewModel.fileScreenEvents(
                                 FileScreenEvents.OnAllTagsClick)
@@ -88,17 +90,16 @@ fun FileScreen(
                     )
                 }
                 items(
-                    items = viewModel.fileScreenState.value.listOfTags,
+                    items = fileInfoState.listOfTags,
                     key = { item ->
                         item.id
                     }
                 ) { item ->
                     BasicButton(
                         text = item.name,
-                        isSelected = item.id in viewModel.fileScreenState.value.listOfSelectedTagsId,
+                        isSelected = item.id in forRecordsState.listOfSelectedTagsId,
                         onButtonClicked = {
-                            viewModel.fileScreenEvents(
-                                FileScreenEvents.OnTagClick(item.id))
+                            viewModel.fileScreenEvents(FileScreenEvents.OnTagClick(item.id))
                         }
                     )
                 }
@@ -106,7 +107,7 @@ fun FileScreen(
             Spacer(modifier = Modifier.width(8.dp))
             LazyColumn{
                 items(
-                    items = viewModel.fileScreenState.value.listOfRecords,
+                    items = listOfRecords,
                     key = { item ->
                         item.id
                     }
@@ -116,9 +117,6 @@ fun FileScreen(
                         title=record.title,
                         tags = record.tags,
                         size=270,
-                        onTagClick={ tag ->
-                            HomeScreenEvents.AddTagToSearch(tag)
-                        },
                         onCardClick = {
                             //navigation to Record + record.id
                         }
@@ -136,10 +134,21 @@ fun FileScreenPreview() {
     CatalogueAppTheme{
         val repository = CatalogueRepositoryImpl()
         val useCases = CatalogueUseCases(
-            getHomeScreenState = GetHomeScreenState(repository),
-            addNewFolder = AddNewFolder(repository)
+            getFolders = GetFolders(repository),
+            addNewFolder = AddNewFolder(repository),
+            getFilteredList = GetFilteredList(),
+            getFiles = GetFiles(repository),
+            getRecords = GetRecords(repository),
+            getFileInfo = GetFileInfo(repository),
+            updateRecord = UpdateRecord(repository),
+            getRecord = GetRecord(repository),
+            addNewFile = AddNewFile(repository),
+            getFileColumns = GetFileColumns(repository),
+            getTagsRecords = GetTagsRecords(repository),
+            addNewRecord = AddNewRecord(repository),
+            addTagRecord = AddTagRecord(repository)
         )
-        val viewModel = FileViewModel(useCases)
+        val viewModel = FileViewModel(useCases, SavedStateHandle())
         FileScreen(viewModel)
     }
 }

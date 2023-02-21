@@ -1,32 +1,25 @@
 package com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.AddNewFolder
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.GetHomeScreenState
+import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.file.FileScreenEvents
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.file.FileViewModel
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.home.NewFolderEvents
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,13 +29,23 @@ fun AddEditFileScreen(
 ) {
     val columnsName = stringResource(R.string.columns)
     val tagsName = stringResource(R.string.tags)
+
+    val addEditFileState by viewModel.addEditFileState.collectAsStateWithLifecycle()
+    val fileInfo by viewModel.fileInfo.collectAsStateWithLifecycle()
+
+    val saveNewFile by viewModel.saveNewFile.collectAsStateWithLifecycle()
+
+    LaunchedEffect(saveNewFile){
+        //navigation
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = {
-                    //Navigation
+                    viewModel.addEditFileEvents(AddEditFileEvents.OnSaveFabClick)
                 },
             ) {
                 Icon(Icons.Filled.Done, "Localized description")
@@ -72,17 +75,17 @@ fun AddEditFileScreen(
                     horizontalArrangement = Arrangement.Start
                 ){
                     items(
-                        items = viewModel.addEditFileState.value.listOfFolders,
+                        items = addEditFileState.listOfFolders,
                         key = { item ->
                             item.id
                         }
                     ) { item ->
                         BasicButton(
                             text = item.name,
-                            isSelected = item.id == viewModel.addEditFileState.value.selectedFolderId,
+                            isSelected = item.id == fileInfo.folderId,
                             onButtonClicked = {
                                 viewModel.addEditFileEvents(
-                                    AddEditFileEvents.OnTagClick(item.id))
+                                    AddEditFileEvents.OnFolderClick(item.id))
                             }
                         )
                     }
@@ -90,7 +93,7 @@ fun AddEditFileScreen(
             }
             item{
                 OutlinedTextField(
-                    value = viewModel.addEditFileState.value.name,
+                    value = fileInfo.name,
                     onValueChange = { name ->
                         viewModel.addEditFileEvents(
                             AddEditFileEvents.OnNameChanged(name))
@@ -107,9 +110,9 @@ fun AddEditFileScreen(
             item {
                 UrlInputWithCheckbox(
                     modifier = Modifier.fillMaxWidth(),
-                    checkedState = viewModel.addEditFileState.value.pathCheckStatus,
+                    checkedState = addEditFileState.pathCheckStatus,
                     title = stringResource(R.string.file_path),
-                    urlText = viewModel.addEditFileState.value.urlPath,
+                    urlText = fileInfo.urlPath,
                     onFolderBtnClick = {
                              //open chooser
                     },
@@ -122,9 +125,9 @@ fun AddEditFileScreen(
             item {
                 UrlInputWithCheckbox(
                     modifier = Modifier.fillMaxWidth(),
-                    checkedState = viewModel.addEditFileState.value.coverImgCheckStatus,
+                    checkedState = addEditFileState.coverImgCheckStatus,
                     title = stringResource(R.string.cover_image),
-                    urlText = viewModel.addEditFileState.value.urlCoverImage,
+                    urlText = fileInfo.urlCoverImage,
                     onFolderBtnClick = {
                         //open chooser
                     },
@@ -154,13 +157,13 @@ fun AddEditFileScreen(
                     viewModel.addEditFileEvents(
                         AddEditFileEvents.OnColumnAddBtnClick)
                 },
-                listOfCards = viewModel.addEditFileState.value.listOfColumns
+                listOfCards = fileInfo.columns
             )
 
             item{
                 CheckboxText(
                     title = tagsName,
-                    checkedState = viewModel.addEditFileState.value.tagCheckStatus
+                    checkedState = addEditFileState.tagCheckStatus
                 )
             }
 
@@ -175,7 +178,7 @@ fun AddEditFileScreen(
                     viewModel.addEditFileEvents(
                         AddEditFileEvents.OnTagAddBtnClick)
                 },
-                listOfCards = viewModel.addEditFileState.value.listOfTags
+                listOfCards = fileInfo.tags
             )
         }
     }
@@ -188,8 +191,19 @@ fun AddEditFileScreenPreview() {
     CatalogueAppTheme{
         val repository = CatalogueRepositoryImpl()
         val useCases = CatalogueUseCases(
-            getHomeScreenState = GetHomeScreenState(repository),
-            addNewFolder = AddNewFolder(repository)
+            getFolders = GetFolders(repository),
+            addNewFolder = AddNewFolder(repository),
+            getFilteredList = GetFilteredList(),
+            getFiles = GetFiles(repository),
+            getRecords = GetRecords(repository),
+            getFileInfo = GetFileInfo(repository),
+            updateRecord = UpdateRecord(repository),
+            getRecord = GetRecord(repository),
+            addNewFile = AddNewFile(repository),
+            getFileColumns = GetFileColumns(repository),
+            getTagsRecords = GetTagsRecords(repository),
+            addNewRecord = AddNewRecord(repository),
+            addTagRecord = AddTagRecord(repository)
         )
         val viewModel = AddEditFileViewModel(useCases)
         AddEditFileScreen(viewModel)

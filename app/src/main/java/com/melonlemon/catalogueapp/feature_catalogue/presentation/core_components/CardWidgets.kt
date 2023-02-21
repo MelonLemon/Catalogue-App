@@ -21,12 +21,15 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
@@ -34,11 +37,10 @@ import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 @Composable
 fun SmartCard(
     modifier: Modifier = Modifier,
-    photo: Painter?=null,
+    photo: String?=null,
     title: String,
     tags: List<String>,
     size: Int,
-    onTagClick: (String) -> Unit,
     onCardClick: () -> Unit
 ) {
     Card(
@@ -60,14 +62,31 @@ fun SmartCard(
             horizontalAlignment = Alignment.End
 
         ) {
-            Image(
-                painter = photo ?: painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Photo File",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(width = (size - 12 * 2).dp, height = 200.dp)
-                    .clip(MaterialTheme.shapes.small)
-            )
+            if(photo!=null){
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(photo)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.placeholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(width = (size - 12 * 2).dp, height = 200.dp)
+                        .clip(MaterialTheme.shapes.small)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.placeholder),
+                    contentDescription = "Photo File",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(width = (size - 12 * 2).dp, height = 200.dp)
+                        .clip(MaterialTheme.shapes.small)
+                )
+            }
+
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,7 +113,7 @@ fun SmartCard(
                 items(tags){ tag ->
                     TagButton(
                         name = tag,
-                        onClick = { onTagClick(tag) }
+                        onClick = { }
                     )
                 }
             }
@@ -106,7 +125,7 @@ fun SmartCard(
 @Composable
 fun HalfSmartCard(
     modifier: Modifier = Modifier,
-    photo: Painter?=null,
+    photo: String?=null,
     tags: List<String>,
     size: Int,
 ) {
@@ -128,16 +147,50 @@ fun HalfSmartCard(
             horizontalAlignment = Alignment.End
 
         ) {
-            Image(
-                painter = photo ?: painterResource(id = R.drawable.ic_launcher_background),
-                contentDescription = "Photo File",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(width = (contentMaxWidth).dp, height = 200.dp)
-                    .clip(MaterialTheme.shapes.small)
-            )
-
-            //Tags - custom layout
+            if(photo!=null){
+                AsyncImage(
+                    model = ImageRequest.Builder(LocalContext.current)
+                        .data(photo)
+                        .crossfade(true)
+                        .build(),
+                    placeholder = painterResource(R.drawable.placeholder),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(width = (size - 12 * 2).dp, height = 200.dp)
+                        .clip(MaterialTheme.shapes.small)
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.placeholder),
+                    contentDescription = "Photo File",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(width = (size - 12 * 2).dp, height = 200.dp)
+                        .clip(MaterialTheme.shapes.small)
+                )
+            }
+            val tagsOG = tags.toMutableList()
+            while(tagsOG.isNotEmpty()){
+                Row(
+                    modifier = Modifier.padding(start = 12.dp, end = 12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    TagButton(
+                        name = tagsOG[0],
+                        onClick = { }
+                    )
+                    tagsOG.removeFirst()
+                    if(tagsOG.isNotEmpty()){
+                        TagButton(
+                            name = tagsOG[0],
+                            onClick = { }
+                        )
+                        tagsOG.removeFirst()
+                    }
+                }
+            }
 
         }
     }
@@ -217,13 +270,10 @@ fun MultiTextCard(
 fun SmartCardPreview() {
     CatalogueAppTheme{
         SmartCard(
-            photo= painterResource(id = R.drawable.ic_launcher_background),
+            photo= null,
             title="Korean food",
             tags = listOf("Spicy", "Chicken"),
             size=270,
-            onTagClick={
-
-            },
             onCardClick = { }
         )
     }
@@ -234,8 +284,8 @@ fun SmartCardPreview() {
 fun HalfSmartCardPreview() {
     CatalogueAppTheme{
         HalfSmartCard(
-            photo= painterResource(id = R.drawable.ic_launcher_background),
-            tags = listOf("Spicy", "Chicken", "Spicy", "Chicken"),
+            photo= null,
+            tags = listOf("Spicy", "Chicken", "Spicy", "Chickennn"),
             size=270,
         )
     }

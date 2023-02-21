@@ -4,24 +4,22 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.AddNewFolder
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.GetHomeScreenState
+import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.BasicButton
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SearchInput
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SmartCard
@@ -33,6 +31,11 @@ import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 fun HomeScreen(
     viewModel: HomeViewModel
 ) {
+    val searchText by viewModel.searchText.collectAsStateWithLifecycle()
+    val selectedFolderId by viewModel.selectedFolderId.collectAsStateWithLifecycle()
+    val foldersInfoState by viewModel.foldersInfoState.collectAsStateWithLifecycle()
+    val listOfFiles by viewModel.listOfFiles.collectAsStateWithLifecycle()
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -55,7 +58,7 @@ fun HomeScreen(
         ) {
             SearchInput(
                 modifier = Modifier.fillMaxWidth(),
-                text = viewModel.homeScreenState.value.searchText,
+                text = searchText,
                 onTextChanged = { text ->
                     viewModel.homeScreenEvents(
                         HomeScreenEvents.OnSearchTextChanged(text))
@@ -74,21 +77,21 @@ fun HomeScreen(
                     item{
                         BasicButton(
                             text = stringResource(R.string.all),
-                            isSelected = viewModel.homeScreenState.value.selectedFolderId == -1,
+                            isSelected = selectedFolderId == -1,
                             onButtonClicked = {
                                 HomeScreenEvents.OnCategoryClick(-1)
                             }
                         )
                     }
                     items(
-                        items = viewModel.homeScreenState.value.listOfFolders,
+                        items = foldersInfoState.listOfFolders,
                         key = { item ->
                             item.id
                         }
                     ) { item ->
                         BasicButton(
                             text = item.name,
-                            isSelected = viewModel.homeScreenState.value.selectedFolderId == item.id,
+                            isSelected = selectedFolderId == item.id,
                             onButtonClicked = {
                                 HomeScreenEvents.OnCategoryClick(item.id)
                             }
@@ -119,19 +122,16 @@ fun HomeScreen(
 
             LazyColumn{
                 items(
-                    items = viewModel.homeScreenState.value.listOfFiles,
+                    items = listOfFiles,
                     key = { item ->
                         item.id
                     }
                 ){ file ->
                     SmartCard(
-                        photo= null, //change
+                        photo= file.photoPath,
                         title=file.title,
                         tags = file.tags,
                         size=270,
-                        onTagClick={ tag ->
-                            HomeScreenEvents.AddTagToSearch(tag)
-                        },
                         onCardClick = {
                             //navigationto File + file.id
                         }
@@ -149,8 +149,19 @@ fun HomeScreenPreview() {
     CatalogueAppTheme{
         val repository = CatalogueRepositoryImpl()
         val useCases = CatalogueUseCases(
-            getHomeScreenState = GetHomeScreenState(repository),
-            addNewFolder = AddNewFolder(repository)
+            getFolders = GetFolders(repository),
+            addNewFolder = AddNewFolder(repository),
+            getFilteredList = GetFilteredList(),
+            getFiles = GetFiles(repository),
+            getRecords = GetRecords(repository),
+            getFileInfo = GetFileInfo(repository),
+            updateRecord = UpdateRecord(repository),
+            getRecord = GetRecord(repository),
+            addTagRecord = AddTagRecord(repository),
+            addNewRecord = AddNewRecord(repository),
+            addNewFile = AddNewFile(repository),
+            getTagsRecords = GetTagsRecords(repository),
+            getFileColumns = GetFileColumns(repository)
         )
         val viewModel = HomeViewModel(useCases)
         HomeScreen(viewModel)

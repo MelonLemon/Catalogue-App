@@ -3,20 +3,24 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.add_new_recor
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.AddNewFolder
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
-import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.GetHomeScreenState
+import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
+import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.AddEditFileEvents
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
@@ -27,13 +31,22 @@ fun AddNewRecordScreen(
 ) {
     val columnsName = stringResource(R.string.columns)
     val tagsName = stringResource(R.string.tags)
+
+    val tagsRecordState by viewModel.tagsRecordState.collectAsStateWithLifecycle()
+    val recordInfo by viewModel.recordInfo.collectAsStateWithLifecycle()
+    val saveNewRecord by viewModel.saveNewRecord.collectAsStateWithLifecycle()
+
+    LaunchedEffect(saveNewRecord){
+        //navigation
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 onClick = {
-                    //Navigation
+                    viewModel.addEditRecordEvents(AddNewRecordEvents.OnSaveFabClick)
                 },
             ) {
                 Icon(Icons.Filled.Done, "Localized description")
@@ -59,7 +72,7 @@ fun AddNewRecordScreen(
 
             item{
                 OutlinedTextField(
-                    value = viewModel.addEditRecordState.value.name,
+                    value = recordInfo.name,
                     onValueChange = { name ->
                         viewModel.addEditRecordEvents(AddNewRecordEvents.OnNameChange(name))
                     },
@@ -76,7 +89,7 @@ fun AddNewRecordScreen(
             item{
                 UrlInput(
                     modifier = Modifier.fillMaxWidth(),
-                    urlText = viewModel.addEditRecordState.value.urlRecord,
+                    urlText = recordInfo.urlString,
                     onFolderBtnClick = {
                         //open chooser
                     },
@@ -86,12 +99,12 @@ fun AddNewRecordScreen(
                 )
             }
 
-            items(viewModel.addEditRecordState.value.listOfColumns){ columnInfo ->
+            itemsIndexed(recordInfo.columnsInfo){ index, columnInfo ->
                 OutlinedTextField(
                     value = columnInfo.text,
                     onValueChange = { text ->
                         viewModel.addEditRecordEvents(AddNewRecordEvents.OnColumnTextChange(
-                            id = columnInfo.id,
+                            index = index,
                             text = text
                         ))
                     },
@@ -110,12 +123,12 @@ fun AddNewRecordScreen(
             item{
                 CheckboxText(
                     title = tagsName,
-                    checkedState = viewModel.addEditRecordState.value.tagCheckStatus
+                    checkedState = tagsRecordState.tagCheckStatus
                 )
             }
 
             addCheckboxText(
-                text = viewModel.addEditRecordState.value.newTag,
+                text = tagsRecordState.newTag,
                 onTextChanged = { name ->
                     viewModel.addEditRecordEvents(
                         AddNewRecordEvents.OnNewTagNameChanged(name))
@@ -125,7 +138,7 @@ fun AddNewRecordScreen(
                     viewModel.addEditRecordEvents(
                         AddNewRecordEvents.OnTagAddBtnClick)
                 },
-                listOfCheckboxText = viewModel.addEditRecordState.value.listOfTags,
+                listOfCheckboxText = tagsRecordState.listOfTags,
                 onCheckStateChange = { id, checkState ->
                     viewModel.addEditRecordEvents(
                         AddNewRecordEvents.OnCheckStateTagChange(
@@ -144,10 +157,21 @@ fun AddNewFileScreenPreview() {
     CatalogueAppTheme{
         val repository = CatalogueRepositoryImpl()
         val useCases = CatalogueUseCases(
-            getHomeScreenState = GetHomeScreenState(repository),
-            addNewFolder = AddNewFolder(repository)
+            getFolders = GetFolders(repository),
+            addNewFolder = AddNewFolder(repository),
+            getFilteredList = GetFilteredList(),
+            getFiles = GetFiles(repository),
+            getRecords = GetRecords(repository),
+            getFileInfo = GetFileInfo(repository),
+            updateRecord = UpdateRecord(repository),
+            getRecord = GetRecord(repository),
+            addNewFile = AddNewFile(repository),
+            getFileColumns = GetFileColumns(repository),
+            getTagsRecords = GetTagsRecords(repository),
+            addNewRecord = AddNewRecord(repository),
+            addTagRecord = AddTagRecord(repository)
         )
-        val viewModel = AddNewRecordViewModel(useCases)
+        val viewModel = AddNewRecordViewModel(useCases, SavedStateHandle())
         AddNewRecordScreen(viewModel)
     }
 }

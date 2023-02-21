@@ -7,4 +7,5 @@ sealed class FileScreenEvents{
     object OnCancelSearchClick: FileScreenEvents()
     object OnAllTagsClick: FileScreenEvents()
     data class OnTagClick(val id: Int): FileScreenEvents()
+
 }

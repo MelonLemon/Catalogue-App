@@ -2,9 +2,15 @@ package com.melonlemon.catalogueapp.feature_catalogue.domain.model
 
 data class CardInfo(
     val id: Int,
+    val hostId: Int,
     val title: String,
     val tags: List<String>,
-    val photoId: Int
+    val photoPath: String
+)
+
+data class FilterFields(
+    val searchText: String,
+    val categoryId: Int
 )
 
 data class CategoryInfo(
@@ -30,4 +36,14 @@ data class RecordInfo(
     val urlString: String,
     val columnsInfo: List<ColumnInfo>,
     val tags: List<String>
+)
+
+data class FileInfo(
+    val id: Int,
+    val name: String,
+    val folderId: Int,
+    val urlPath: String,
+    val urlCoverImage: String,
+    val columns: List<CategoryInfo>,
+    val tags: List<CategoryInfo>
 )

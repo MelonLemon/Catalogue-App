@@ -74,7 +74,8 @@ fun TagButton(
         Text(
             text = name,
             color = MaterialTheme.colorScheme.onSecondaryContainer,
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
