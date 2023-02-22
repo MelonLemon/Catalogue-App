@@ -12,6 +12,5 @@ data class CatalogueUseCases(
     val addNewFile: AddNewFile,
     val getTagsRecords: GetTagsRecords,
     val getFileColumns: GetFileColumns,
-    val addTagRecord: AddTagRecord,
     val addNewRecord: AddNewRecord
 )

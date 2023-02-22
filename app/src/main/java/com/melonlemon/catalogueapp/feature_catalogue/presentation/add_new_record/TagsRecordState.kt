@@ -6,6 +6,6 @@ import com.melonlemon.catalogueapp.feature_catalogue.domain.model.SelectedCatego
 data class TagsRecordState(
     val tagCheckStatus: Boolean = false,
     val newTag: String = "",
-    val listOfTags:  List<SelectedCategoryInfo> = listOf(),
-    val listOfNewTags: List<String> = listOf()
+    val listOfTags:  List<String> = listOf(),
+    val listOfSelectedTagsIndex:  List<Int> = listOf()
 )

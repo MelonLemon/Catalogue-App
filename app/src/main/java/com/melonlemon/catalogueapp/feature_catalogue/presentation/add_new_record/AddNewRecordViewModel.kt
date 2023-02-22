@@ -77,7 +77,7 @@ class AddNewRecordViewModel(
             is AddNewRecordEvents.OnTagAddBtnClick -> {
                 viewModelScope.launch {
                     val newListTags = tagsRecordState.value.listOfTags.toMutableList()
-                    newListTags.add(SelectedCategoryInfo(newListTags.size, tagsRecordState.value.newTag, true))
+                    newListTags.add(tagsRecordState.value.newTag)
                     _tagsRecordState.value = tagsRecordState.value.copy(
                         newTag = "",
                         listOfTags = newListTags
@@ -85,25 +85,22 @@ class AddNewRecordViewModel(
                 }
             }
             is AddNewRecordEvents.OnCheckStateTagChange -> {
-                // Change to Index
-                val newListTags = tagsRecordState.value.listOfTags.toMutableList()
-                val replaceValue = newListTags.find { it.id == event.id }
+                val newListTags = tagsRecordState.value.listOfSelectedTagsIndex.toMutableList()
+                if(event.index in tagsRecordState.value.listOfSelectedTagsIndex)
+                    newListTags.remove(event.index) else newListTags.add(event.index)
                 _tagsRecordState.value = tagsRecordState.value.copy(
                     newTag = "",
-                    listOfTags = newListTags
+                    listOfSelectedTagsIndex = newListTags
                 )
+
             }
             is AddNewRecordEvents.OnSaveFabClick -> {
                 viewModelScope.launch {
+                    val tags = tagsRecordState.value.listOfTags.filterIndexed { index, _ ->  index in tagsRecordState.value.listOfSelectedTagsIndex }
                     _recordInfo.value = recordInfo.value.copy(
-//                        tags = tagsRecordState.value.listOfTags.all{
-//                            it.isSelected
-//                        }.map {
-//                            it.name
-//                        }
+                        tags = tags
                     )
                     useCases.addNewRecord(recordInfo.value)
-//                    useCases.addTagRecord()
                 }
             }
 

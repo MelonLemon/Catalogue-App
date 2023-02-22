@@ -157,7 +157,6 @@ fun HomeScreenPreview() {
             getFileInfo = GetFileInfo(repository),
             updateRecord = UpdateRecord(repository),
             getRecord = GetRecord(repository),
-            addTagRecord = AddTagRecord(repository),
             addNewRecord = AddNewRecord(repository),
             addNewFile = AddNewFile(repository),
             getTagsRecords = GetTagsRecords(repository),

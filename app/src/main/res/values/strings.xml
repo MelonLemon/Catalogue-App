@@ -12,4 +12,8 @@
     <string name="tags">Tags</string>
     <string name="record">Record</string>
     <string name="no_tags">No Tags</string>
+    <string name="empty_name">Empty Name!</string>
+    <string name="duplicate_name">Duplicate name!</string>
+    <string name="success">Success!</string>
+    <string name="unknown_error">Unknown Error!</string>
 </resources>

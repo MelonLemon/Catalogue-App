@@ -8,16 +8,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class GetRecord(
-    repository: CatalogueRepository
+    private val repository: CatalogueRepository
 ) {
-    suspend operator fun invoke(recordId: Int): RecordInfo {
+    suspend operator fun invoke(fieldId: Int, recordId: Int): RecordInfo {
 
-        return RecordInfo(
-            id = -1,
-            name = "",
-            urlString = "",
-            columnsInfo = listOf(),
-            tags = listOf()
-        )
+        return repository.getRecord(fieldId, recordId)
     }
 }

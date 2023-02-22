@@ -5,10 +5,10 @@ import com.melonlemon.catalogueapp.feature_catalogue.domain.model.SelectedCatego
 import com.melonlemon.catalogueapp.feature_catalogue.domain.repository.CatalogueRepository
 
 class GetTagsRecords(
-    repository: CatalogueRepository
+    private val repository: CatalogueRepository
 ) {
-    suspend operator fun invoke(fileId: Int): List<SelectedCategoryInfo> {
+    suspend operator fun invoke(fileId: Int): List<String> {
 
-        return  listOf()
+        return  repository.getFileRecordTags(fileId)
     }
 }

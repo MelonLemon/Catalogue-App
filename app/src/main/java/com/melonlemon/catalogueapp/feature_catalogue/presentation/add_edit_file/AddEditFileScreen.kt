@@ -202,8 +202,7 @@ fun AddEditFileScreenPreview() {
             addNewFile = AddNewFile(repository),
             getFileColumns = GetFileColumns(repository),
             getTagsRecords = GetTagsRecords(repository),
-            addNewRecord = AddNewRecord(repository),
-            addTagRecord = AddTagRecord(repository)
+            addNewRecord = AddNewRecord(repository)
         )
         val viewModel = AddEditFileViewModel(useCases)
         AddEditFileScreen(viewModel)

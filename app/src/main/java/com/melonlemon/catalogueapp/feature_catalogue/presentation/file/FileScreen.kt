@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
@@ -89,17 +90,12 @@ fun FileScreen(
                         }
                     )
                 }
-                items(
-                    items = fileInfoState.listOfTags,
-                    key = { item ->
-                        item.id
-                    }
-                ) { item ->
+                itemsIndexed(fileInfoState.listOfTags) { _,item ->
                     BasicButton(
-                        text = item.name,
-                        isSelected = item.id in forRecordsState.listOfSelectedTagsId,
+                        text = item,
+                        isSelected = item in forRecordsState.listOfSelectedTags,
                         onButtonClicked = {
-                            viewModel.fileScreenEvents(FileScreenEvents.OnTagClick(item.id))
+                            viewModel.fileScreenEvents(FileScreenEvents.OnTagClick(item))
                         }
                     )
                 }
@@ -145,8 +141,7 @@ fun FileScreenPreview() {
             addNewFile = AddNewFile(repository),
             getFileColumns = GetFileColumns(repository),
             getTagsRecords = GetTagsRecords(repository),
-            addNewRecord = AddNewRecord(repository),
-            addTagRecord = AddTagRecord(repository)
+            addNewRecord = AddNewRecord(repository)
         )
         val viewModel = FileViewModel(useCases, SavedStateHandle())
         FileScreen(viewModel)

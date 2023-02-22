@@ -7,10 +7,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class GetFileInfo(
-    repository: CatalogueRepository
+    private val repository: CatalogueRepository
 ) {
     suspend operator fun invoke(fileId:Int): FileInfoState {
-
-        return FileInfoState()
+        val title = repository.getFileTitle(fileId)
+        val tags = repository.getFileRecordTags(fileId)
+        return FileInfoState(title, tags)
     }
 }

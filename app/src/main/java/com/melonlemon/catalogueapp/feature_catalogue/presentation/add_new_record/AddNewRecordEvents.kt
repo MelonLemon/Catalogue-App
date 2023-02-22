@@ -8,6 +8,6 @@ sealed class AddNewRecordEvents{
     data class OnColumnTextChange(val index: Int, val text: String): AddNewRecordEvents()
     data class OnNewTagNameChanged(val name: String): AddNewRecordEvents()
     object OnTagAddBtnClick: AddNewRecordEvents()
-    data class OnCheckStateTagChange(val id: Int, val checkState: Boolean): AddNewRecordEvents()
+    data class OnCheckStateTagChange(val index: Int, val checkState: Boolean): AddNewRecordEvents()
     object OnSaveFabClick: AddNewRecordEvents()
 }

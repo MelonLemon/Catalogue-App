@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.CardInfo
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.FilterFields
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.CheckStatusAddStr
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -83,14 +84,28 @@ class HomeViewModel(
             }
             is NewFolderEvents.OnAddButtonClick -> {
                 viewModelScope.launch {
-                    useCases.addNewFolder(foldersInfoState.value.newFolder)
-                    val newFolderList = useCases.getFolders()
-                    _foldersInfoState.value = foldersInfoState.value.copy(
-                        newFolder = " ",
-                        listOfFolders = newFolderList
-                    )
+                    val status = useCases.addNewFolder(
+                        foldersInfoState.value.newFolder,
+                        foldersInfoState.value.listOfFolders)
+                    if(status== CheckStatusAddStr.SuccessStatus){
+                        val newFolderList = useCases.getFolders()
+                        _foldersInfoState.value = foldersInfoState.value.copy(
+                            newFolder = " ",
+                            listOfFolders = newFolderList,
+                            folderAddStatus = status
+                        )
+                    } else {
+                        _foldersInfoState.value = foldersInfoState.value.copy(
+                            folderAddStatus = status
+                        )
+                    }
                 }
+            }
 
+            is NewFolderEvents.OnAddComplete -> {
+                _foldersInfoState.value = foldersInfoState.value.copy(
+                    folderAddStatus = CheckStatusAddStr.UnCheckedStatus
+                )
             }
 
         }

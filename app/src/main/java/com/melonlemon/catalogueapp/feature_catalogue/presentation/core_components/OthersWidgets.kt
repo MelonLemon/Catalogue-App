@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -98,7 +99,7 @@ fun LazyListScope.addCards(
     placeholder: String,
     onTextChanged: (String) -> Unit,
     onAddBtnClick: () -> Unit,
-    listOfCards: List<CategoryInfo>
+    listOfCards: List<String>
 ){
     item{
         TextInputAdd(
@@ -113,7 +114,7 @@ fun LazyListScope.addCards(
     items(listOfCards){ card ->
         LineTextCard(
             modifier = Modifier.fillMaxWidth(),
-            text = card.name
+            text = card
         )
         Spacer(modifier = Modifier.width(16.dp))
     }
@@ -124,7 +125,8 @@ fun LazyListScope.addCheckboxText(
     placeholder: String,
     onTextChanged: (String) -> Unit,
     onAddBtnClick: () -> Unit,
-    listOfCheckboxText: List<SelectedCategoryInfo>,
+    listOfCheckboxText: List<String>,
+    listOfSelected: List<Int>,
     onCheckStateChange: (Int, Boolean) -> Unit
 ){
     item{
@@ -137,14 +139,14 @@ fun LazyListScope.addCheckboxText(
             onAddBtnClick = onAddBtnClick
         )
     }
-    items(listOfCheckboxText){ checkboxText ->
+    itemsIndexed(listOfCheckboxText){ index, checkboxText ->
         CheckboxText(
             modifier = Modifier.fillMaxWidth(),
-            title = checkboxText.name,
-            checkedState = checkboxText.isSelected,
+            title = checkboxText,
+            checkedState = index in listOfSelected,
             onStateChange = {  checkStatus ->
                 onCheckStateChange(
-                    checkboxText.id, checkStatus
+                    index, checkStatus
                 )
             }
         )

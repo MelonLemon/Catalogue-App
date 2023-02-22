@@ -5,7 +5,7 @@ data class CardInfo(
     val hostId: Int,
     val title: String,
     val tags: List<String>,
-    val photoPath: String
+    val photoPath: String?
 )
 
 data class FilterFields(
@@ -44,6 +44,6 @@ data class FileInfo(
     val folderId: Int,
     val urlPath: String,
     val urlCoverImage: String,
-    val columns: List<CategoryInfo>,
-    val tags: List<CategoryInfo>
+    val columns: List<String>,
+    val tags: List<String>
 )

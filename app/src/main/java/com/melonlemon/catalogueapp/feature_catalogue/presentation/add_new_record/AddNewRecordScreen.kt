@@ -29,7 +29,7 @@ import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 fun AddNewRecordScreen(
     viewModel: AddNewRecordViewModel
 ) {
-    val columnsName = stringResource(R.string.columns)
+
     val tagsName = stringResource(R.string.tags)
 
     val tagsRecordState by viewModel.tagsRecordState.collectAsStateWithLifecycle()
@@ -139,10 +139,11 @@ fun AddNewRecordScreen(
                         AddNewRecordEvents.OnTagAddBtnClick)
                 },
                 listOfCheckboxText = tagsRecordState.listOfTags,
-                onCheckStateChange = { id, checkState ->
+                listOfSelected = tagsRecordState.listOfSelectedTagsIndex,
+                onCheckStateChange = { index, checkState ->
                     viewModel.addEditRecordEvents(
                         AddNewRecordEvents.OnCheckStateTagChange(
-                            id, checkState
+                            index, checkState
                         ))
                 }
             )
@@ -168,8 +169,7 @@ fun AddNewFileScreenPreview() {
             addNewFile = AddNewFile(repository),
             getFileColumns = GetFileColumns(repository),
             getTagsRecords = GetTagsRecords(repository),
-            addNewRecord = AddNewRecord(repository),
-            addTagRecord = AddTagRecord(repository)
+            addNewRecord = AddNewRecord(repository)
         )
         val viewModel = AddNewRecordViewModel(useCases, SavedStateHandle())
         AddNewRecordScreen(viewModel)

@@ -5,10 +5,9 @@ import com.melonlemon.catalogueapp.feature_catalogue.domain.repository.Catalogue
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.home.FoldersInfoState
 
 class GetFolders(
-    repository: CatalogueRepository
+    private val repository: CatalogueRepository
 ) {
     suspend operator fun invoke(): List<CategoryInfo>{
-
-        return listOf()
+        return repository.getFolders()
     }
 }

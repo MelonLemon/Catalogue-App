@@ -4,10 +4,9 @@ import com.melonlemon.catalogueapp.feature_catalogue.domain.model.RecordInfo
 import com.melonlemon.catalogueapp.feature_catalogue.domain.repository.CatalogueRepository
 
 class UpdateRecord(
-    repository: CatalogueRepository
+    private val repository: CatalogueRepository
 ) {
-    suspend operator fun invoke(recordInfo: RecordInfo){
-
-
+    suspend operator fun invoke(fieldId: Int, recordInfo: RecordInfo){
+        repository.updateRecord(fieldId, recordInfo)
     }
 }

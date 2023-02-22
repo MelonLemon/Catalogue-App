@@ -57,7 +57,6 @@ class FileViewModel(
                     fileId = fileId
                 )
             }
-
         }
 
     }
@@ -76,10 +75,10 @@ class FileViewModel(
                 )
             }
             is FileScreenEvents.OnTagClick -> {
-                val newList = forRecordsState.value.listOfSelectedTagsId.toMutableList()
-                if(event.id in newList) newList.remove(event.id) else newList.add(event.id)
+                val newList = forRecordsState.value.listOfSelectedTags.toMutableList()
+                if(event.tag in newList) newList.remove(event.tag) else newList.add(event.tag)
                 _forRecordsState.value = forRecordsState.value.copy(
-                    listOfSelectedTagsId = newList
+                    listOfSelectedTags = newList
                 )
             }
         }

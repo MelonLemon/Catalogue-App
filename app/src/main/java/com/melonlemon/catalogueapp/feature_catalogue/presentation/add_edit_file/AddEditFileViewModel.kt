@@ -70,7 +70,7 @@ class AddEditFileViewModel(
             }
             is AddEditFileEvents.OnColumnAddBtnClick -> {
                 val newListColumns = fileInfo.value.columns.toMutableList()
-                newListColumns.add(CategoryInfo(newListColumns.size, addEditFileState.value.newColumn))
+                newListColumns.add(addEditFileState.value.newColumn)
                 _addEditFileState.value = addEditFileState.value.copy(
                     newColumn = ""
                 )
@@ -86,7 +86,7 @@ class AddEditFileViewModel(
             is AddEditFileEvents.OnTagAddBtnClick -> {
 
                 val newListTags = fileInfo.value.tags.toMutableList()
-                newListTags.add(CategoryInfo(newListTags.size, addEditFileState.value.newTag))
+                newListTags.add(addEditFileState.value.newTag)
                 _addEditFileState.value = addEditFileState.value.copy(
                     newTag = ""
                 )

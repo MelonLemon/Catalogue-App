@@ -26,11 +26,18 @@ class RecordViewModel(
     private val _saveRecordChanging= MutableStateFlow(false)
     val saveRecordChanging = _saveRecordChanging.asStateFlow()
 
+    private var fieldIdRecord: Int = -1
+
     init {
         val recordId = savedStateHandle.get<Int>("recordId")
+        val fieldId = savedStateHandle.get<Int>("fieldId")
         viewModelScope.launch {
-           if(recordId!=null) {
-               _selectedRecordFullInfo.value = useCases.getRecord(recordId)
+           if(recordId!=null && fieldId!=null) {
+               _selectedRecordFullInfo.value = useCases.getRecord(
+                   fieldId = fieldId,
+                   recordId = recordId
+               )
+               fieldIdRecord = fieldId
            }
         }
 
@@ -51,7 +58,7 @@ class RecordViewModel(
             }
             is RecordScreenEvents.SaveRecordChanges -> {
                 viewModelScope.launch {
-                    useCases.updateRecord(selectedRecordFullInfo.value)
+                    useCases.updateRecord(fieldIdRecord, selectedRecordFullInfo.value)
                     _saveRecordChanging.value = true
                 }
             }

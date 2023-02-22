@@ -58,8 +58,7 @@ fun RecordScreen(
             item{
                 HalfSmartCard(
                     photo= null,
-                    tags = selectedRecordFullInfo.tags ?:
-                    listOf(stringResource(R.string.no_tags)),
+                    tags = selectedRecordFullInfo.tags ?: listOf(stringResource(R.string.no_tags)),
                     size=270,
                 )
             }
@@ -71,7 +70,7 @@ fun RecordScreen(
                         viewModel.recordScreenEvents(
                             RecordScreenEvents.OnSelRecordColumnChange(
                             index = index,
-                            text = columnInfo.text
+                            text = text
                         ))
                     }
                 )
@@ -100,8 +99,7 @@ fun RecordScreenPreview() {
             addNewFile = AddNewFile(repository),
             getFileColumns = GetFileColumns(repository),
             getTagsRecords = GetTagsRecords(repository),
-            addNewRecord = AddNewRecord(repository),
-            addTagRecord = AddTagRecord(repository)
+            addNewRecord = AddNewRecord(repository)
         )
         val viewModel = RecordViewModel(useCases, SavedStateHandle())
         RecordScreen(viewModel)

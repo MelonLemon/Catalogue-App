@@ -5,10 +5,17 @@ import com.melonlemon.catalogueapp.feature_catalogue.domain.model.SelectedCatego
 import com.melonlemon.catalogueapp.feature_catalogue.domain.repository.CatalogueRepository
 
 class GetFileColumns(
-    repository: CatalogueRepository
+    private val repository: CatalogueRepository
 ) {
     suspend operator fun invoke(fileId: Int): List<ColumnInfo> {
 
-        return  listOf()
+        val columns = repository.getFileColumns(fileId)
+        var id = 1
+        val listOfColumns = mutableListOf<ColumnInfo>()
+        columns.forEach {
+            listOfColumns.add(ColumnInfo(id = id, label = it, text =""))
+            id +=1
+        }
+        return listOfColumns
     }
 }

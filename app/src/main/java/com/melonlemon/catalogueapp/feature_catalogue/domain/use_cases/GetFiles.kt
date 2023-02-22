@@ -6,10 +6,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
 class GetFiles(
-    repository: CatalogueRepository
+    private val repository: CatalogueRepository
 ) {
      operator fun invoke(folderId:Int): Flow<List<CardInfo>> {
-
-        return flowOf(emptyList())
+         if(folderId==-1){
+             return repository.getAllFiles()
+         } else {
+             return repository.getFilesByFolderId(folderId)
+         }
     }
 }
