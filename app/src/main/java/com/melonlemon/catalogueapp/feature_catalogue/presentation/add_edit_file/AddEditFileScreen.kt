@@ -19,6 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
+import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.AddEditFileEvents
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
@@ -64,7 +65,7 @@ fun AddEditFileScreen(
                     onArrowBackClick = {
                         // Navigation
                     },
-                    title = stringResource(R.string.folders)
+                    title = stringResource(R.string.add_file)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             }
@@ -72,7 +73,7 @@ fun AddEditFileScreen(
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ){
                     items(
                         items = addEditFileState.listOfFolders,
@@ -107,19 +108,11 @@ fun AddEditFileScreen(
                         text= stringResource(R.string.name))
                     })
             }
-            item {
-                UrlInputWithCheckbox(
+
+            item{
+                LineTextCard(
                     modifier = Modifier.fillMaxWidth(),
-                    checkedState = addEditFileState.pathCheckStatus,
-                    title = stringResource(R.string.file_path),
-                    urlText = fileInfo.urlPath,
-                    onFolderBtnClick = {
-                             //open chooser
-                    },
-                    onUrlChange = { urlString ->
-                        viewModel.addEditFileEvents(
-                            AddEditFileEvents.OnUrlPathChange(urlString))
-                    }
+                    text = fileInfo.urlPath
                 )
             }
             item {

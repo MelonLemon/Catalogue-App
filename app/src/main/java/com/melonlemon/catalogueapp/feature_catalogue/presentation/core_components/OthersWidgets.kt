@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -17,6 +19,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -160,7 +163,8 @@ fun TextInputAdd(
     text: String,
     placeholder: String,
     onTextChanged: (String) -> Unit,
-    onAddBtnClick: () -> Unit
+    onAddBtnClick: () -> Unit,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     Row(
         modifier = Modifier
@@ -176,6 +180,9 @@ fun TextInputAdd(
             onValueChange = { name ->
                 onTextChanged(name)
             },
+            keyboardOptions = KeyboardOptions(
+                keyboardType = keyboardType
+            ),
             shape = MaterialTheme.shapes.extraSmall,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -192,6 +199,8 @@ fun TextInputAdd(
         )
     }
 }
+
+
 
 @Preview(showBackground = true)
 @Composable

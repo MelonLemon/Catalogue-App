@@ -73,15 +73,20 @@ fun HomeScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                LazyRow{
+                LazyRow(
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 8.dp)
+                ){
                     item{
                         BasicButton(
                             text = stringResource(R.string.all),
                             isSelected = selectedFolderId == -1,
                             onButtonClicked = {
-                                HomeScreenEvents.OnCategoryClick(-1)
+                                viewModel.homeScreenEvents(
+                                    HomeScreenEvents.OnCategoryClick(-1))
                             }
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
                     items(
                         items = foldersInfoState.listOfFolders,
@@ -93,9 +98,11 @@ fun HomeScreen(
                             text = item.name,
                             isSelected = selectedFolderId == item.id,
                             onButtonClicked = {
-                                HomeScreenEvents.OnCategoryClick(item.id)
+                                viewModel.homeScreenEvents(
+                                    HomeScreenEvents.OnCategoryClick(item.id))
                             }
                         )
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
                 }
                 Spacer(modifier = Modifier.width(8.dp))
@@ -120,7 +127,9 @@ fun HomeScreen(
                 }
             }
 
-            LazyColumn{
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ){
                 items(
                     items = listOfFiles,
                     key = { item ->

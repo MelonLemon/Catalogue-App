@@ -88,6 +88,7 @@ fun AddFolderScreen(
             )
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
 
                 items(foldersInfoState.listOfFolders){ folder ->

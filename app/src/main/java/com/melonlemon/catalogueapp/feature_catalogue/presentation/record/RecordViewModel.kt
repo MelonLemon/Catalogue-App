@@ -29,8 +29,10 @@ class RecordViewModel(
     private var fieldIdRecord: Int = -1
 
     init {
-        val recordId = savedStateHandle.get<Int>("recordId")
-        val fieldId = savedStateHandle.get<Int>("fieldId")
+//        val recordId = savedStateHandle.get<Int>("recordId")
+//        val fieldId = savedStateHandle.get<Int>("fieldId")
+        val recordId = 1
+        val fieldId = 3
         viewModelScope.launch {
            if(recordId!=null && fieldId!=null) {
                _selectedRecordFullInfo.value = useCases.getRecord(

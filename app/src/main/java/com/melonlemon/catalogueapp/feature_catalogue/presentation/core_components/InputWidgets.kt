@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -14,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.melonlemon.catalogueapp.R
@@ -36,7 +38,7 @@ fun SearchInput(
         onValueChange = onTextChanged,
         shape = MaterialTheme.shapes.extraSmall,
         colors = TextFieldDefaults.outlinedTextFieldColors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            focusedBorderColor = MaterialTheme.colorScheme.secondary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline
         ),
         placeholder = { Text(
@@ -81,6 +83,9 @@ fun UrlInput(
         colors = TextFieldDefaults.outlinedTextFieldColors(
             focusedBorderColor = MaterialTheme.colorScheme.primary,
             unfocusedBorderColor = MaterialTheme.colorScheme.outline
+        ),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Uri
         ),
         placeholder = {
             Text(
@@ -130,42 +135,10 @@ fun UrlInputWithCheckbox(
             title = title,
             checkedState = checkedState
         )
-        OutlinedTextField(
-            value = urlText,
-            onValueChange = onUrlChange,
-            shape = MaterialTheme.shapes.extraSmall,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline
-            ),
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.search)
-                )
-            },
-            trailingIcon = {
-                Box(
-                    modifier = Modifier.padding(
-                        end = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    IconButton(
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .background(
-                                MaterialTheme.colorScheme.secondaryContainer
-                            ),
-                        onClick = onFolderBtnClick
-                    ) {
-                        Icon(
-                            imageVector = ImageVector.vectorResource(id = R.drawable.ic_baseline_folder_open_24),
-                            contentDescription = "Cancel",
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
-
-            }
+        UrlInput(
+            urlText = urlText,
+            onFolderBtnClick = onFolderBtnClick,
+            onUrlChange = onUrlChange
         )
     }
 }

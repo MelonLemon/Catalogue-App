@@ -52,7 +52,7 @@ fun RecordScreen(
                     onArrowBackClick = {
                         viewModel.recordScreenEvents(RecordScreenEvents.SaveRecordChanges)
                     },
-                    title = stringResource(R.string.folders)
+                    title = selectedRecordFullInfo.name
                 )
             }
             item{

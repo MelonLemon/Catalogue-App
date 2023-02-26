@@ -89,6 +89,7 @@ fun FileScreen(
                                 FileScreenEvents.OnAllTagsClick)
                         }
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                 }
                 itemsIndexed(fileInfoState.listOfTags) { _,item ->
                     BasicButton(
@@ -98,10 +99,13 @@ fun FileScreen(
                             viewModel.fileScreenEvents(FileScreenEvents.OnTagClick(item))
                         }
                     )
+                    Spacer(modifier = Modifier.width(4.dp))
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
-            LazyColumn{
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ){
                 items(
                     items = listOfRecords,
                     key = { item ->

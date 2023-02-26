@@ -2,7 +2,6 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.add_new_recor
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -20,7 +19,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.AddEditFileEvents
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 

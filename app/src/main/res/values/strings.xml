@@ -16,4 +16,23 @@
     <string name="duplicate_name">Duplicate name!</string>
     <string name="success">Success!</string>
     <string name="unknown_error">Unknown Error!</string>
+    <string name="add_file">Add File</string>
+    <string name="new_file">New File</string>
+    <string name="existing_file">Existing File</string>
+    <string name="next">NEXT</string>
+    <string name="path_fail_status">Check File Path! Something is wrong!</string>
+    <string name="file_name_fail">Check file\'s name!</string>
+    <string name="no_rights_fail">You do not have rights! Choose other file!</string>
+    <string name="choose_folder">Choose Folder</string>
+    <string name="path_folder_fail">Path is not correct</string>
+    <string name="rights">Rights</string>
+    <string name="no_permission_detect">No Permission Detect</string>
+    <string name="private_type">Private</string>
+    <string name="public_type">Public</string>
+    <string name="public_link_type">Public with Link</string>
+    <string name="visibility">Visibility</string>
+    <string name="email">Email</string>
+    <string name="permission_lvl_viewer">Viewer</string>
+    <string name="permission_lvl_commenter">Commenter</string>
+    <string name="permission_lvl_editor">Editor</string>
 </resources>

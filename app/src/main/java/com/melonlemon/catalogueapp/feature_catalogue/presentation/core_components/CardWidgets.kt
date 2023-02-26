@@ -260,7 +260,7 @@ fun MultiTextCard(
                 if( enabled){
                     onValueChange(text)
                 }
-            },
+            }
         )
     }
 }

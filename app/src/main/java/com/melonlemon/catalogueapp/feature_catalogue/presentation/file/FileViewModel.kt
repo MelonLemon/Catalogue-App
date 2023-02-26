@@ -49,7 +49,8 @@ class FileViewModel(
     )
 
     init {
-        val fileId = savedStateHandle.get<Int>("fileId")
+//        val fileId = savedStateHandle.get<Int>("fileId")
+        val fileId = 3
         viewModelScope.launch {
             if(fileId!=null){
                 _fileInfoState.value = useCases.getFileInfo(fileId)

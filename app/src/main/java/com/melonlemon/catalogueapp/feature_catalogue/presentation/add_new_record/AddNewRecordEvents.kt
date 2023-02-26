@@ -1,7 +1,5 @@
 package com.melonlemon.catalogueapp.feature_catalogue.presentation.add_new_record
 
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.AddEditFileEvents
-
 sealed class AddNewRecordEvents{
     data class OnUrlPathChange(val urlString: String): AddNewRecordEvents()
     data class OnNameChange(val name: String): AddNewRecordEvents()
