@@ -5,32 +5,21 @@ import com.melonlemon.catalogueapp.feature_catalogue.presentation.file.FileInfoS
 import kotlinx.coroutines.flow.Flow
 
 interface CatalogueRepository {
-    suspend fun getFolders(): List<CategoryInfo>
+    suspend fun getFolders(): List<Folders>
 
-    fun getAllFiles(): Flow<List<CardInfo>>
+    fun getAllFiles(): Flow<List<Files>>
 
-    fun getFilesByFolderId(folderId:Int): Flow<List<CardInfo>>
-
-    fun getAllRecords(fileId: Int): Flow<List<CardInfo>>
-
-    fun getRecordsByTags(fileId: Int, tags: List<String>): Flow<List<CardInfo>>
+    fun getFilesByFolderId(folderId:Int): Flow<List<Files>>
 
     suspend fun addNewFolder(name: String)
 
-    suspend fun getFileTitle(fileId:Int): String
+    suspend fun addNewFile(files: Files)
 
-    suspend fun getFileRecordTags(fileId:Int): List<String>
+    suspend fun getFileById(fileId: Int): Files
 
-    suspend fun getRecord(fieldId: Int, recordId: Int): RecordInfo
+    suspend fun deleteFiles(filesId: List<Int>)
 
-    suspend fun updateRecord(fieldId: Int, recordInfo: RecordInfo)
-
-    suspend fun addNewFile(fileInfo: FileInfo)
-
-    suspend fun addNewRecord(recordInfo: RecordInfo)
-
-    suspend fun getFileColumns(fieldId: Int): List<String>
-
+    suspend fun deleteFolder(folderId: Int)
 
 
 }

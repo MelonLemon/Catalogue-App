@@ -2,10 +2,12 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.core_componen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -15,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -23,9 +26,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.CategoryInfo
-import com.melonlemon.catalogueapp.feature_catalogue.domain.model.SelectedCategoryInfo
+import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.AddEditFileEvents
+import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.ColumnType
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.home.NewFolderEvents
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
@@ -107,9 +112,7 @@ fun LazyListScope.addCards(
     item{
         TextInputAdd(
             text = text,
-            onTextChanged = { name ->
-                onTextChanged(name)
-            },
+            onTextChanged = onTextChanged,
             placeholder = placeholder,
             onAddBtnClick = onAddBtnClick
         )
@@ -177,12 +180,7 @@ fun TextInputAdd(
                 .fillMaxWidth()
                 .weight(1f),
             value = text,
-            onValueChange = { name ->
-                onTextChanged(name)
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = keyboardType
-            ),
+            onValueChange = onTextChanged,
             shape = MaterialTheme.shapes.extraSmall,
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = MaterialTheme.colorScheme.primary,
@@ -200,7 +198,89 @@ fun TextInputAdd(
     }
 }
 
+@Composable
+fun ColumnsDialog(
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    columnType: ColumnType,
+    listColumn: List<String>,
+    selectedIndex: Int,
+    onColumnClick: (Int) -> Unit
+) {
+    Dialog(
+        onDismissRequest = { onCancelClick()},
+    ) {
+        Card(
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(11.dp)
+            ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(24.dp),
+                horizontalAlignment = Alignment.Start
+            ){
+                Text(
+                    text = stringResource(R.string.choose) + " " + columnType.name + " " +
+                        stringResource(R.string.column),
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ){
+                    itemsIndexed(listColumn){index, name ->
+                        SelectLineTextCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = name,
+                            isSelected = index==selectedIndex,
+                            onCardClick = {
+                                onColumnClick(index)
+                            }
+                        )
+                        Divider(modifier = Modifier.height(1.dp),
+                            color = MaterialTheme.colorScheme.outlineVariant)
+                    }
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ){
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
+                        ),
+                        onClick = { onCancelClick() }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.cancel),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
+                        ),
+                        onClick = { onSaveClick() }
+                    ) {
+                        Text(
+                            text = stringResource(R.string.save),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            }
+        }
 
+    }
+    
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -211,6 +291,26 @@ fun BackArrowRowPreview() {
 
             },
             title = "Folders"
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ColumnsDialogPreview() {
+    CatalogueAppTheme{
+        ColumnsDialog(
+            onSaveClick = {
+
+            },
+            onCancelClick = {
+
+            },
+            columnType = ColumnType.TitleColumn("Example"),
+            listColumn = listOf("Example1", "Example2", "Example3"),
+            selectedIndex = 1,
+            onColumnClick = {
+            }
         )
     }
 }

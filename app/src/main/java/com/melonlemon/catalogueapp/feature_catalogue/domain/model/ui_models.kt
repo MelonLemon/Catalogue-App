@@ -8,42 +8,39 @@ data class CardInfo(
     val photoPath: String?
 )
 
-data class FilterFields(
-    val searchText: String,
-    val categoryId: Int
-)
-
 data class CategoryInfo(
     val id: Int,
     val name: String
 )
 
 data class ColumnInfo(
-    val id: Int,
     val label: String,
     val text: String
 )
 
-data class SelectedCategoryInfo(
-    val id: Int,
-    val name: String,
-    val isSelected: Boolean
-)
-
 data class RecordInfo(
     val id: Int,
-    val name: String,
-    val urlString: String,
-    val columnsInfo: List<ColumnInfo>,
-    val tags: List<String>
+    val title: String,
+    val category: String,
+    val coverImg: String?,
+    val columnsInfo: List<ColumnInfo>
 )
 
 data class FileInfo(
     val id: Int,
     val name: String,
     val folderId: Int,
-    val urlPath: String,
-    val urlCoverImage: String,
+    val imageCover: String?,
+    val infoForLoading: InfoForLoading,
     val columns: List<String>,
     val tags: List<String>
+)
+
+data class InfoForLoading(
+    val sheetsId: String,
+    val titleColumnIndex: Int,
+    val subHeaderColumnIndex: Int,
+    val categoryColumnIndex: Int,
+    val covImgRecordsIndex: Int?=null,
+    val numberOfColumns: Int
 )

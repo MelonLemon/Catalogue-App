@@ -3,6 +3,7 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.core_componen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -136,6 +137,7 @@ fun UrlInputWithCheckbox(
             checkedState = checkedState
         )
         UrlInput(
+            modifier = Modifier.fillMaxWidth(),
             urlText = urlText,
             onFolderBtnClick = onFolderBtnClick,
             onUrlChange = onUrlChange

@@ -35,4 +35,24 @@
     <string name="permission_lvl_viewer">Viewer</string>
     <string name="permission_lvl_commenter">Commenter</string>
     <string name="permission_lvl_editor">Editor</string>
+    <string name="type_link">Enter Google Sheets Id</string>
+    <string name="choose_cat_column">Choose Category Column</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="files_titles">All Files</string>
+    <string name="choose">CHOOSE</string>
+    <string name="access">Access</string>
+    <string name="access_desc">You have access to view file</string>
+    <string name="err_msg_column_num">Enter number of Columns!</string>
+    <string name="num_columns">Number of Columns</string>
+    <string name="placeholder_num_columns">Enter number of Columns</string>
+    <string name="btn_check">Check</string>
+    <string name="choose_title_column">Choose Title Column.</string>
+    <string name="choose_subheader_column">Choose subheader Column.</string>
+    <string name="coverimage_for_records">Choose CoverImage for Records, can be none!</string>
+    <string name="title">Title</string>
+    <string name="sub_header">SubHeader</string>
+    <string name="category">Category</string>
+    <string name="column">column</string>
+    <string name="save">Save</string>
 </resources>

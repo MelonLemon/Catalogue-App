@@ -6,7 +6,5 @@ data class AddEditFileState(
     val listOfFolders:  List<CategoryInfo> = listOf(),
     val newTag: String = "",
     val tagCheckStatus: Boolean = false,
-    val newColumn: String = "",
-    val pathCheckStatus: Boolean = false,
     val coverImgCheckStatus: Boolean = false,
 )

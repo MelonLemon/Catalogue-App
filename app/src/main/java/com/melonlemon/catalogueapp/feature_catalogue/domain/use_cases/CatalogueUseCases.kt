@@ -6,11 +6,13 @@ data class CatalogueUseCases(
     val getFiles: GetFiles,
     val getFilteredList: GetFilteredList,
     val getRecords: GetRecords,
-    val getFileInfo: GetFileInfo,
-    val updateRecord: UpdateRecord,
-    val getRecord: GetRecord,
+    val getFileColumnTitles: GetFileColumnTitles,
     val addNewFile: AddNewFile,
-    val getTagsRecords: GetTagsRecords,
-    val getFileColumns: GetFileColumns,
-    val addNewRecord: AddNewRecord
+    val getFileCategories: GetFileCategories,
+    val getInfoForLoading: GetInfoForLoading,
+    val getFilteredFiles: GetFilteredFiles,
+    val deleteFiles: DeleteFiles,
+    val deleteFolder: DeleteFolder,
+    val getFirstRow: GetFirstRow,
+    val getFileById: GetFileById
 )

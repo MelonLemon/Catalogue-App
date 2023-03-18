@@ -3,14 +3,17 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.file
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.melonlemon.catalogueapp.feature_catalogue.domain.model.RecordInfo
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.record.RecordScreenEvents
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class FileViewModel(
+@HiltViewModel
+class FileViewModel @Inject constructor(
     private val useCases: CatalogueUseCases,
     private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
@@ -48,14 +51,35 @@ class FileViewModel(
         _listOfRecords.value
     )
 
+    private val _selectedRecordFullInfo = MutableStateFlow<List<String>>(emptyList())
+    val selectedRecordFullInfo = _selectedRecordFullInfo.asStateFlow()
+
+    private val _columnsTitles = MutableStateFlow<List<String>>(emptyList())
+    val columnsTitles = _columnsTitles.asStateFlow()
+
     init {
-//        val fileId = savedStateHandle.get<Int>("fileId")
-        val fileId = 3
+        val fileId = savedStateHandle.get<Int>("fileId")
+        val title = savedStateHandle.get<String>("title")
         viewModelScope.launch {
             if(fileId!=null){
-                _fileInfoState.value = useCases.getFileInfo(fileId)
+
+                val infoForLoading = useCases.getInfoForLoading(fileId)
+                //separate changing part with not changing part
                 _forRecordsState.value = forRecordsState.value.copy(
-                    fileId = fileId
+                    fileId = fileId,
+                    sheetId = infoForLoading.sheetsId,
+                    titleColumnIndex = infoForLoading.titleColumnIndex,
+                    subHeaderColumnIndex = infoForLoading.subHeaderColumnIndex,
+                    categoryColumn = infoForLoading.categoryColumnIndex,
+                    numberOfColumns = infoForLoading.numberOfColumns
+                )
+                val listCategories = useCases.getFileCategories(
+                    sheetId =  infoForLoading.sheetsId,
+                    categoryColumnIndex = infoForLoading.categoryColumnIndex
+                )
+                _fileInfoState.value = fileInfoState.value.copy(
+                    title = title?:"",
+                    listOfCategories = listCategories
                 )
             }
         }
@@ -72,16 +96,27 @@ class FileViewModel(
             }
             is FileScreenEvents.OnAllTagsClick -> {
                 _forRecordsState.value = forRecordsState.value.copy(
-                    isAllTagsSelected = !forRecordsState.value.isAllTagsSelected
+                    isAllCategoriesSelected = !forRecordsState.value.isAllCategoriesSelected
                 )
             }
             is FileScreenEvents.OnTagClick -> {
-                val newList = forRecordsState.value.listOfSelectedTags.toMutableList()
+                val newList = forRecordsState.value.listOfSelectedCategories.toMutableList()
                 if(event.tag in newList) newList.remove(event.tag) else newList.add(event.tag)
                 _forRecordsState.value = forRecordsState.value.copy(
-                    listOfSelectedTags = newList
+                    listOfSelectedCategories = newList
                 )
             }
+            is FileScreenEvents.OnRecordSelect -> {
+                viewModelScope.launch {
+                    _columnsTitles.value  = useCases.getFileColumnTitles(
+                        sheetsId = forRecordsState.value.sheetId,
+                        numColumns = forRecordsState.value.numberOfColumns
+                    )
+                    _selectedRecordFullInfo.value = listOfRecords.value[event.index]
+                }
+
+            }
+
         }
     }
 

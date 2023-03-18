@@ -1,44 +1,69 @@
 package com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file
 
+import android.net.Uri
+import android.widget.Space
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.AddEditFileEvents
+import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.ColumnType
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditFileScreen(
+    saveBtnClick: () -> Unit,
+    backBtnClick: () -> Unit,
     viewModel: AddEditFileViewModel
 ) {
-    val columnsName = stringResource(R.string.columns)
+
     val tagsName = stringResource(R.string.tags)
 
     val addEditFileState by viewModel.addEditFileState.collectAsStateWithLifecycle()
     val fileInfo by viewModel.fileInfo.collectAsStateWithLifecycle()
-
+    val columnsDialogState by viewModel.columnsDialogState.collectAsStateWithLifecycle()
     val saveNewFile by viewModel.saveNewFile.collectAsStateWithLifecycle()
+    val fileColumns by viewModel.fileColumns.collectAsStateWithLifecycle()
+
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        if(uri!=null){
+            viewModel.addEditFileEvents(AddEditFileEvents.OnUrlCoverImgChange(uri.toString()))
+        }
+    }
 
     LaunchedEffect(saveNewFile){
-        //navigation
+        saveBtnClick()
     }
+
+    val columnsDialog = remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
@@ -58,13 +83,11 @@ fun AddEditFileScreen(
                 .fillMaxWidth()
                 .padding(it),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
             item{
                 BackArrowRow(
-                    onArrowBackClick = {
-                        // Navigation
-                    },
+                    onArrowBackClick = backBtnClick,
                     title = stringResource(R.string.add_file)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -94,6 +117,7 @@ fun AddEditFileScreen(
             }
             item{
                 OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = fileInfo.name,
                     onValueChange = { name ->
                         viewModel.addEditFileEvents(
@@ -112,17 +136,18 @@ fun AddEditFileScreen(
             item{
                 LineTextCard(
                     modifier = Modifier.fillMaxWidth(),
-                    text = fileInfo.urlPath
+                    text = fileInfo.sheetsId
                 )
             }
+
             item {
                 UrlInputWithCheckbox(
                     modifier = Modifier.fillMaxWidth(),
                     checkedState = addEditFileState.coverImgCheckStatus,
                     title = stringResource(R.string.cover_image),
-                    urlText = fileInfo.urlCoverImage,
+                    urlText = fileInfo.coverImg ?:"",
                     onFolderBtnClick = {
-                        //open chooser
+                        launcher.launch("image/*")
                     },
                     onUrlChange = { urlString ->
                         viewModel.addEditFileEvents(
@@ -130,29 +155,131 @@ fun AddEditFileScreen(
                     }
                 )
             }
-
             item{
-                LineTextCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.link_column)
-                )
+                if(fileInfo.coverImg!=""){
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(fileInfo.coverImg)
+                            .crossfade(true)
+                            .build(),
+                        placeholder = painterResource(R.drawable.placeholder),
+                        error = painterResource(R.drawable.placeholder_error),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .height(200.dp)
+                            .clip(MaterialTheme.shapes.small)
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(id = R.drawable.placeholder),
+                        contentDescription = "Photo File",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .height(200.dp)
+                            .clip(MaterialTheme.shapes.small)
+                    )
+                }
+
             }
 
-
-            addCards(
-                text = viewModel.addEditFileState.value.newColumn,
-                onTextChanged = { name ->
-                    viewModel.addEditFileEvents(
-                        AddEditFileEvents.OnNewColumnNameChanged(name))
-                },
-                placeholder = columnsName,
-                onAddBtnClick = {
-                    viewModel.addEditFileEvents(
-                        AddEditFileEvents.OnColumnAddBtnClick)
-                },
-                listOfCards = fileInfo.columns
-            )
-
+            item{
+                Text(
+                    text = stringResource(R.string.choose_title_column),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            item{
+                val title = stringResource(R.string.title)
+                LineClickTextCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = fileColumns[fileInfo.titleColumnIndex],
+                    onLineClick = {
+                        viewModel.addEditFileEvents(
+                            AddEditFileEvents.OnColumnTypeClick(
+                                index = fileInfo.titleColumnIndex,
+                                columnType = ColumnType.TitleColumn(title)
+                            ))
+                        columnsDialog.value = true
+                    }
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item{
+                Text(
+                    text = stringResource(R.string.choose_subheader_column),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            item{
+                val subHeader = stringResource(R.string.sub_header)
+                LineClickTextCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = fileColumns[fileInfo.subHeaderColumnIndex],
+                    onLineClick = {
+                        viewModel.addEditFileEvents(
+                            AddEditFileEvents.OnColumnTypeClick(
+                                index = fileInfo.subHeaderColumnIndex,
+                                columnType = ColumnType.SubHeaderColumn(subHeader)
+                            ))
+                        columnsDialog.value = true
+                    }
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item{
+                Text(
+                    text = stringResource(R.string.choose_cat_column),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            item{
+                val category = stringResource(R.string.category)
+                LineClickTextCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = fileColumns[fileInfo.categoryColumnIndex],
+                    onLineClick = {
+                        viewModel.addEditFileEvents(
+                            AddEditFileEvents.OnColumnTypeClick(
+                                index = fileInfo.categoryColumnIndex,
+                                columnType = ColumnType.CategoryColumn(category)
+                            ))
+                        columnsDialog.value = true
+                    }
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item{
+                Text(
+                    text = stringResource(R.string.coverimage_for_records),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            item{
+                val coverImgRec = stringResource(R.string.coverimage_for_records)
+                LineClickTextCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = if(fileInfo.covImgRecColumnIndex!=null)
+                        fileColumns[fileInfo.covImgRecColumnIndex!!] else "",
+                    onLineClick = {
+                        viewModel.addEditFileEvents(
+                            AddEditFileEvents.OnColumnTypeClick(
+                                index = fileInfo.covImgRecColumnIndex?:0,
+                                columnType = ColumnType.CovImgRecordColumn(coverImgRec)
+                            ))
+                        columnsDialog.value = true
+                    }
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
             item{
                 CheckboxText(
                     title = tagsName,
@@ -173,31 +300,31 @@ fun AddEditFileScreen(
                 },
                 listOfCards = fileInfo.tags
             )
+            item{
+                Spacer(modifier = Modifier.height(100.dp))
+            }
+
+        }
+
+        if(columnsDialog.value){
+            ColumnsDialog(
+                onSaveClick = {
+                    viewModel.addEditFileEvents(AddEditFileEvents.OnSaveDialogClick)
+                    columnsDialog.value = false
+                },
+                onCancelClick = {
+                    viewModel.addEditFileEvents(AddEditFileEvents.OnCancelDialogClick)
+                    columnsDialog.value = false
+                },
+                columnType = columnsDialogState.columnType,
+                listColumn = fileColumns,
+                selectedIndex = columnsDialogState.selectedIndex,
+                onColumnClick = { index ->
+                    viewModel.addEditFileEvents(AddEditFileEvents.OnColumnDialogClick(index))
+                }
+            )
         }
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun AddEditFileScreenPreview() {
-    CatalogueAppTheme{
-        val repository = CatalogueRepositoryImpl()
-        val useCases = CatalogueUseCases(
-            getFolders = GetFolders(repository),
-            addNewFolder = AddNewFolder(repository),
-            getFilteredList = GetFilteredList(),
-            getFiles = GetFiles(repository),
-            getRecords = GetRecords(repository),
-            getFileInfo = GetFileInfo(repository),
-            updateRecord = UpdateRecord(repository),
-            getRecord = GetRecord(repository),
-            addNewFile = AddNewFile(repository),
-            getFileColumns = GetFileColumns(repository),
-            getTagsRecords = GetTagsRecords(repository),
-            addNewRecord = AddNewRecord(repository)
-        )
-        val viewModel = AddEditFileViewModel(useCases)
-        AddEditFileScreen(viewModel)
-    }
-}

@@ -4,17 +4,18 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.melonlemon.catalogueapp.feature_catalogue.domain.model.CardInfo
-import com.melonlemon.catalogueapp.feature_catalogue.domain.model.FilterFields
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
 import com.melonlemon.catalogueapp.feature_catalogue.domain.util.CheckStatusAddStr
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.TransactionCheckStatus
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-
-class HomeViewModel(
+@HiltViewModel
+class HomeViewModel  @Inject constructor(
     private val useCases: CatalogueUseCases
 ): ViewModel() {
 
@@ -23,6 +24,12 @@ class HomeViewModel(
 
     private val _searchText = MutableStateFlow("")
     val searchText = _searchText.asStateFlow()
+
+    private val _deleteState = MutableStateFlow(DeleteFileState())
+    val deleteState = _deleteState.asStateFlow()
+
+    private val _deleteFolderCheckState = MutableStateFlow<TransactionCheckStatus>(TransactionCheckStatus.UnCheckedStatus)
+    val deleteFolderCheckState = _deleteFolderCheckState.asStateFlow()
 
     private val _selectedFolderId = MutableStateFlow(-1)
     val selectedFolderId = _selectedFolderId.asStateFlow()
@@ -41,7 +48,7 @@ class HomeViewModel(
         .debounce(500L)
         .combine(_listOfFiles)
     { searchText, listOfFiles  ->
-        useCases.getFilteredList(
+        useCases.getFilteredFiles(
             listCards = listOfFiles,
             searchText = searchText
         )
@@ -71,6 +78,50 @@ class HomeViewModel(
             is HomeScreenEvents.OnCategoryClick -> {
                 _selectedFolderId.value = event.id
             }
+            is HomeScreenEvents.OnDeleteToggleBtnClick -> {
+                _deleteState.value = deleteState.value.copy(
+                    deleteState = event.status
+                )
+            }
+            is HomeScreenEvents.OnDeleteBtnClick -> {
+                viewModelScope.launch {
+                    val result = useCases.deleteFiles(deleteState.value.deleteList)
+                    if(result== TransactionCheckStatus.SuccessStatus){
+                        _deleteState.value = deleteState.value.copy(
+                            deleteState = false,
+                            deleteList = emptyList(),
+                            deleteCheckStatus = result
+                        )
+                    } else {
+                        _deleteState.value = deleteState.value.copy(
+                            deleteCheckStatus = result
+                        )
+                    }
+
+                }
+
+            }
+            is HomeScreenEvents.OnCancelBtnClick -> {
+                _deleteState.value = deleteState.value.copy(
+                    deleteState = false,
+                    deleteList = emptyList(),
+                    deleteCheckStatus = TransactionCheckStatus.UnCheckedStatus
+                )
+            }
+            is HomeScreenEvents.OnDeleteChosenClick -> {
+                val newList = deleteState.value.deleteList.toMutableList()
+                if(event.status) newList.add(event.id) else newList.remove(event.id)
+                _deleteState.value = deleteState.value.copy(
+                    deleteList = newList
+                )
+            }
+            is HomeScreenEvents.OnDeleteCompleteClick -> {
+                _deleteState.value = deleteState.value.copy(
+                    deleteCheckStatus = TransactionCheckStatus.UnCheckedStatus
+                )
+            }
+
+
         }
     }
 
@@ -107,6 +158,17 @@ class HomeViewModel(
                     folderAddStatus = CheckStatusAddStr.UnCheckedStatus
                 )
             }
+            is NewFolderEvents.DeleteFolder -> {
+                viewModelScope.launch {
+                    val result = useCases.deleteFolder(event.id)
+                }
+            }
+
+            is NewFolderEvents.OnFolderDeleteComplete -> {
+                _deleteFolderCheckState.value = TransactionCheckStatus.UnCheckedStatus
+            }
+
+
 
         }
     }

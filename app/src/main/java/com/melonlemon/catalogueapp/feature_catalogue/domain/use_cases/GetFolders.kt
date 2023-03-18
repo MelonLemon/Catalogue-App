@@ -8,6 +8,13 @@ class GetFolders(
     private val repository: CatalogueRepository
 ) {
     suspend operator fun invoke(): List<CategoryInfo>{
-        return repository.getFolders()
+        val folders = repository.getFolders()
+        if(folders.isNotEmpty()){
+            val categoryInfo = mutableListOf<CategoryInfo>()
+            folders.forEach { categoryInfo.add(CategoryInfo(it.id!!, it.name)) }
+            return categoryInfo
+        }
+        return emptyList()
+
     }
 }

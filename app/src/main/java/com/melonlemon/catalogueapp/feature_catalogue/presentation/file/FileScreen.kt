@@ -3,10 +3,7 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.file
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,18 +14,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.BackArrowRow
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.BasicButton
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SearchInput
-import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SmartCard
+import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FileScreen(
+    backBtnClick: () -> Unit,
+    onRecordClick: () -> Unit,
     viewModel: FileViewModel
 ) {
     val searchText by viewModel.searchText.collectAsStateWithLifecycle()
@@ -36,19 +33,7 @@ fun FileScreen(
     val forRecordsState by viewModel.forRecordsState.collectAsStateWithLifecycle()
     val listOfRecords by viewModel.listOfRecords.collectAsStateWithLifecycle()
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                onClick = {
-                    //Navigation
-                },
-            ) {
-                Icon(Icons.Filled.Add, "Localized description")
-            }
-        }
-    ) { it ->
+    Scaffold() { it ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -57,9 +42,7 @@ fun FileScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             BackArrowRow(
-                onArrowBackClick = {
-                    // Navigation
-                },
+                onArrowBackClick = backBtnClick,
                 title = fileInfoState.title
             )
             SearchInput(
@@ -83,7 +66,7 @@ fun FileScreen(
                 item{
                     BasicButton(
                         text = stringResource(R.string.all),
-                        isSelected = forRecordsState.isAllTagsSelected,
+                        isSelected = forRecordsState.isAllCategoriesSelected,
                         onButtonClicked = {
                             viewModel.fileScreenEvents(
                                 FileScreenEvents.OnAllTagsClick)
@@ -91,10 +74,10 @@ fun FileScreen(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                 }
-                itemsIndexed(fileInfoState.listOfTags) { _,item ->
+                itemsIndexed(fileInfoState.listOfCategories) { _, item ->
                     BasicButton(
                         text = item,
-                        isSelected = item in forRecordsState.listOfSelectedTags,
+                        isSelected = item in forRecordsState.listOfSelectedCategories,
                         onButtonClicked = {
                             viewModel.fileScreenEvents(FileScreenEvents.OnTagClick(item))
                         }
@@ -106,19 +89,17 @@ fun FileScreen(
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
-                items(
-                    items = listOfRecords,
-                    key = { item ->
-                        item.id
-                    }
-                ){ record ->
-                    SmartCard(
-                        photo= null, //change
-                        title=record.title,
-                        tags = record.tags,
+                val sizeRecords = listOfRecords.size
+                items(sizeRecords){ index ->
+                    RecordSmartCard(
+                        title = listOfRecords[index][forRecordsState.titleColumnIndex],
+                        subHeader = listOfRecords[index][forRecordsState.subHeaderColumnIndex],
                         size=270,
+                        photo = if(forRecordsState.covImgRecordsIndex!=null) listOfRecords[index][forRecordsState.covImgRecordsIndex!!]
+                        else null,
                         onCardClick = {
-                            //navigation to Record + record.id
+                            viewModel.fileScreenEvents(FileScreenEvents.OnRecordSelect(index))
+                            onRecordClick()
                         }
                     )
                 }
@@ -128,26 +109,3 @@ fun FileScreen(
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun FileScreenPreview() {
-    CatalogueAppTheme{
-        val repository = CatalogueRepositoryImpl()
-        val useCases = CatalogueUseCases(
-            getFolders = GetFolders(repository),
-            addNewFolder = AddNewFolder(repository),
-            getFilteredList = GetFilteredList(),
-            getFiles = GetFiles(repository),
-            getRecords = GetRecords(repository),
-            getFileInfo = GetFileInfo(repository),
-            updateRecord = UpdateRecord(repository),
-            getRecord = GetRecord(repository),
-            addNewFile = AddNewFile(repository),
-            getFileColumns = GetFileColumns(repository),
-            getTagsRecords = GetTagsRecords(repository),
-            addNewRecord = AddNewRecord(repository)
-        )
-        val viewModel = FileViewModel(useCases, SavedStateHandle())
-        FileScreen(viewModel)
-    }
-}
