@@ -13,21 +13,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.melonlemon.catalogueapp.R
-import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
-import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuthenticationFileScreen(
     nextBtnClick: () -> Unit,
+    backBtn: () -> Unit,
     viewModel: AddEditFileViewModel
 ) {
 
@@ -99,7 +96,7 @@ fun AuthenticationFileScreen(
             item {
                 BackArrowRow(
                     onArrowBackClick = {
-                        // Navigation
+                        backBtn()
                     },
                     title = stringResource(R.string.add_file)
                 )
@@ -112,27 +109,52 @@ fun AuthenticationFileScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start
                 ){
-                    OutlinedTextField(
-                        modifier = Modifier,
-                        value = authenticationState.fullUrlExistingFile,
-                        onValueChange = { urlString ->
-                            viewModel.addEditFileEvents(
-                                AddEditFileEvents.FullUrlExistingFileChange(urlString))
-                        },
-                        shape = MaterialTheme.shapes.extraSmall,
-                        colors = TextFieldDefaults.outlinedTextFieldColors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Uri
-                        ),
-                        placeholder = {
-                            Text(
-                                text = stringResource(R.string.type_link)
-                            )
-                        },
-                    )
+                    Column(
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ){
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            value = authenticationState.sheetsId,
+                            onValueChange = { idString ->
+                                viewModel.addEditFileEvents(
+                                    AddEditFileEvents.OnSheetsIdChange(idString))
+                            },
+                            shape = MaterialTheme.shapes.extraSmall,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            ),
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Uri
+                            ),
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.type_link)
+                                )
+                            },
+                        )
+                        OutlinedTextField(
+                            modifier = Modifier.weight(1f),
+                            value = authenticationState.sheetsName,
+                            onValueChange = { name ->
+                                viewModel.addEditFileEvents(
+                                    AddEditFileEvents.OnSheetsNameChange(name))
+                            },
+                            shape = MaterialTheme.shapes.extraSmall,
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                            ),
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.google_sheet_name)
+                                )
+                            },
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
                     Button(
                         contentPadding = PaddingValues(8.dp),
                         shape = MaterialTheme.shapes.small,

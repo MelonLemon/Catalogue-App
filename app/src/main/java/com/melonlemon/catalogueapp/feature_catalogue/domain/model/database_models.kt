@@ -25,6 +25,7 @@ data class Files(
     @ColumnInfo(name = "folder_id") val folderId: Int,
     @ColumnInfo(name = "sheets_id") val sheetsId: String,
     @ColumnInfo(name = "num_columns") val numColumns: Int,
+    val sheetsName: String,
     val titleColumnIndex: Int,
     val subHeaderColumnIndex: Int,
     val categoryColumnIndex: Int,

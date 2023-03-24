@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                                 onAddNewFileClick = { navController.navigate(Screens.AuthenticationFileScreen.route) },
                                 onFolderBtnClick = { navController.navigate(Screens.AddFolderScreen.route) },
                                 onFileClick = { fileId, title ->
-                                    "${Screens.FileScreen.route}?fileId=${fileId}&title=${title}"},
+                                    navController.navigate("${Screens.FileScreen.route}?fileId=${fileId}&title=${title}")},
                                 viewModel = viewModel
                             )
                         }
@@ -79,6 +79,7 @@ class MainActivity : ComponentActivity() {
                             val viewModel = hiltViewModel<AddEditFileViewModel>()
                             AuthenticationFileScreen(
                                 nextBtnClick = { navController.navigate(Screens.AddEditFileScreen.route) },
+                                backBtn= { navController.popBackStack() },
                                 viewModel = viewModel
                             )
                         }

@@ -49,7 +49,19 @@ interface CatalogueDao {
 
     //Get Files By FolderId
     @Query("SELECT * FROM files WHERE file_id=:fileId")
-    fun getFileById(fileId: Int): Files
+    suspend fun getFileById(fileId: Int): Files
 
+    //UPDATE FILES CHANGE FOLDER ID
+    @Query("UPDATE files SET folder_id=:newFolderId WHERE folder_id=:oldFolderId")
+    suspend fun updateFilesFolderId(oldFolderId: Int, newFolderId: Int)
 
+    //DELETE FOLDER WITH CHANGE OF FOLDER
+    @Transaction
+    suspend fun deleteFolderWithChange(deletedFolder: Int, newFolderId: Int){
+        updateFilesFolderId(
+            oldFolderId = deletedFolder,
+            newFolderId = newFolderId
+        )
+        deleteFolder(folderId = deletedFolder)
+    }
 }

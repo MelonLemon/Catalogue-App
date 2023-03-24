@@ -14,5 +14,7 @@ data class CatalogueUseCases(
     val deleteFiles: DeleteFiles,
     val deleteFolder: DeleteFolder,
     val getFirstRow: GetFirstRow,
-    val getFileById: GetFileById
+    val getFileById: GetFileById,
+    val getConstantFolderId: GetConstantFolderId,
+    val checkUrlValidation: CheckUrlValidation
 )

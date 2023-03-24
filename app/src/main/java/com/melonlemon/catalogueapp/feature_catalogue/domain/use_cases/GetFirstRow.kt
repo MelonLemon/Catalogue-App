@@ -14,36 +14,28 @@ class GetFirstRow(
     private val fileRepository: FileRepository
 ) {
 
-    suspend operator fun invoke(sheetsId: String, number: Int): Pair<TransactionCheckStatus, List<String>?>{
+    suspend operator fun invoke(sheetsId: String, sheetsName: String, number: Int): Pair<TransactionCheckStatus, List<String>?>{
         if(sheetsId.isBlank()){
             return Pair(TransactionCheckStatus.BlankParameterFailStatus, null)
         }
-        val key = BuildConfig.API_KEY
         if(number==0){
-            return try {
-                //change to name of sheet
-                val result = fileRepository.getRecords(
-                    spreadsheetId = sheetsId,
-                    range = "A1:A1",
-                    apiKey = key
-                ).first()
-                Pair(TransactionCheckStatus.SuccessStatus, result[0])
-            } catch (e: Exception){
-                Pair(TransactionCheckStatus.UnKnownFailStatus, null)
-            }
-        } else {
-            val endRange = '@' + number
-            return try {
-                val result = fileRepository.getRecords(
-                    spreadsheetId = sheetsId,
-                    range = "A1:${endRange}1",
-                    apiKey = key
-                ).first()
-                Pair(TransactionCheckStatus.SuccessStatus, result[0])
-            } catch (e: Exception){
-                Pair(TransactionCheckStatus.UnKnownFailStatus, null)
-            }
+           return Pair(TransactionCheckStatus.UnKnownFailStatus, null)
         }
+        val key = BuildConfig.API_KEY
+        val sheetName = "'$sheetsName'"
+
+        val endRange = '@' + number
+        return try {
+            val result = fileRepository.getRecords(
+                spreadsheetId = sheetsId,
+                range = "$sheetName!A1:${endRange}1",
+                apiKey = key
+            ).first().values
+            Pair(TransactionCheckStatus.SuccessStatus, result[0])
+        } catch (e: Exception){
+            Pair(TransactionCheckStatus.UnKnownFailStatus, null)
+        }
+
 
 
 }

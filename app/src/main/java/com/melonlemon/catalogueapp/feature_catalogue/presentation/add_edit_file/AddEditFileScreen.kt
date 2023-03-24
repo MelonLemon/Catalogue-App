@@ -31,9 +31,12 @@ import coil.request.ImageRequest
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.CheckStatusAddStr
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.TransactionCheckStatus
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.AddEditFileEvents
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.ColumnType
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
+import com.melonlemon.catalogueapp.feature_catalogue.presentation.home.NewFolderEvents
 import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,6 +54,8 @@ fun AddEditFileScreen(
     val columnsDialogState by viewModel.columnsDialogState.collectAsStateWithLifecycle()
     val saveNewFile by viewModel.saveNewFile.collectAsStateWithLifecycle()
     val fileColumns by viewModel.fileColumns.collectAsStateWithLifecycle()
+    val rightsCheck by viewModel.rightsCheck.collectAsStateWithLifecycle()
+
 
 
     val launcher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
@@ -63,9 +68,28 @@ fun AddEditFileScreen(
         saveBtnClick()
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val sucessMsg = stringResource(R.string.success)
+
+    if(rightsCheck!= TransactionCheckStatus.UnCheckedStatus){
+
+        LaunchedEffect(rightsCheck){
+
+            snackbarHostState.showSnackbar(
+                message = if(rightsCheck==TransactionCheckStatus.SuccessStatus) sucessMsg else
+                    "No Success",
+                actionLabel = null
+            )
+            viewModel.addEditFileEvents(AddEditFileEvents.OnRightCheckRefresh)
+        }
+    }
+
     val columnsDialog = remember { mutableStateOf(false) }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
+        },
         floatingActionButton = {
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primary,

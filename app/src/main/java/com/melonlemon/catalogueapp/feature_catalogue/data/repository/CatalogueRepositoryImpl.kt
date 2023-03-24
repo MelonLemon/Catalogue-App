@@ -1,6 +1,7 @@
 package com.melonlemon.catalogueapp.feature_catalogue.data.repository
 
 import com.melonlemon.catalogueapp.feature_catalogue.data.data_source.CatalogueDao
+import com.melonlemon.catalogueapp.feature_catalogue.data.util.CONSTANT_FOLDER_ID
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.*
 import com.melonlemon.catalogueapp.feature_catalogue.domain.repository.CatalogueRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,12 +17,16 @@ class CatalogueRepositoryImpl(
         return dao.getFolders()
     }
     override suspend fun deleteFolder(folderId: Int) {
-        dao.deleteFolder(folderId)
+
+        dao.deleteFolderWithChange(
+            deletedFolder = folderId,
+            newFolderId = CONSTANT_FOLDER_ID
+        )
     }
 
-//    override suspend fun getSheetsIdByFileId(fileId: Int): Pair<String, Int> {
-//        return dao.getSheetsIdByFileId(fileId)
-//    }
+    override suspend fun getConstantFolderId(): Int {
+        return CONSTANT_FOLDER_ID
+    }
 
     override fun getAllFiles(): Flow<List<Files>> {
 
@@ -29,7 +34,6 @@ class CatalogueRepositoryImpl(
     }
 
     override fun getFilesByFolderId(folderId: Int): Flow<List<Files>> {
-
         return dao.getFilesByFolder(folderId)
     }
 

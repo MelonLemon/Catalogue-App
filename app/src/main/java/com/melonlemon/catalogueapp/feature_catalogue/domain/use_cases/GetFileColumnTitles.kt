@@ -17,7 +17,7 @@ class GetFileColumnTitles(
                 spreadsheetId = sheetsId,
                 range = "A1:${endRange}1",
                 apiKey = key
-            ).first()
+            ).first().values
             return titles[0].toMutableList()
         }
         return emptyList()

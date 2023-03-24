@@ -6,20 +6,16 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.melonlemon.catalogueapp.R
-import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
-import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,6 +28,18 @@ fun FileScreen(
     val fileInfoState by viewModel.fileInfoState.collectAsStateWithLifecycle()
     val forRecordsState by viewModel.forRecordsState.collectAsStateWithLifecycle()
     val listOfRecords by viewModel.listOfRecords.collectAsStateWithLifecycle()
+    val isDownloading by viewModel.isDownloading.collectAsStateWithLifecycle()
+    val recordClick by viewModel.recordClick.collectAsStateWithLifecycle()
+
+
+    if(recordClick){
+        LaunchedEffect(recordClick){
+            viewModel.fileScreenEvents(FileScreenEvents.RecordClickRefresh)
+            onRecordClick()
+        }
+    }
+
+
 
     Scaffold() { it ->
         Column(
@@ -77,7 +85,8 @@ fun FileScreen(
                 itemsIndexed(fileInfoState.listOfCategories) { _, item ->
                     BasicButton(
                         text = item,
-                        isSelected = item in forRecordsState.listOfSelectedCategories,
+                        isSelected = if(forRecordsState.isAllCategoriesSelected) false
+                        else item in forRecordsState.listOfSelectedCategories,
                         onButtonClicked = {
                             viewModel.fileScreenEvents(FileScreenEvents.OnTagClick(item))
                         }
@@ -86,24 +95,35 @@ fun FileScreen(
                 }
             }
             Spacer(modifier = Modifier.width(8.dp))
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ){
-                val sizeRecords = listOfRecords.size
-                items(sizeRecords){ index ->
-                    RecordSmartCard(
-                        title = listOfRecords[index][forRecordsState.titleColumnIndex],
-                        subHeader = listOfRecords[index][forRecordsState.subHeaderColumnIndex],
-                        size=270,
-                        photo = if(forRecordsState.covImgRecordsIndex!=null) listOfRecords[index][forRecordsState.covImgRecordsIndex!!]
-                        else null,
-                        onCardClick = {
-                            viewModel.fileScreenEvents(FileScreenEvents.OnRecordSelect(index))
-                            onRecordClick()
-                        }
+            if(isDownloading){
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ){
+                    val sizeRecords = listOfRecords.size
+                    //column is number of column starts with 1(A, B, C etc)
+                    //That's why we have to minus 1
+                    //RecordSmartCard as well get thumbnail from standard Youtube Link
+                    items(sizeRecords){ index ->
+                        RecordSmartCard(
+                            title = listOfRecords[index][forRecordsState.titleColumnIndex-1],
+                            subHeader = listOfRecords[index][forRecordsState.subHeaderColumnIndex-1],
+                            size=270,
+                            photo = if(forRecordsState.covImgRecordsIndex!=null) listOfRecords[index][forRecordsState.covImgRecordsIndex!!-1]
+                            else null,
+                            onCardClick = {
+                                viewModel.fileScreenEvents(FileScreenEvents.OnRecordSelect(index))
+                            }
+                        )
+                    }
+                }
             }
+
         }
     }
 }

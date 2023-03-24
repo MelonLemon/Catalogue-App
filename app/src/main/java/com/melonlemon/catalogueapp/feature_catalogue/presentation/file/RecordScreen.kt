@@ -37,24 +37,37 @@ fun RecordScreen(
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            //Error!!!!
+            //java.lang.IndexOutOfBoundsException: Empty list doesn't contain element at index 1
+            if(selectedRecordFullInfo.isEmpty()){
+                item{
+                    BackArrowRow(
+                        onArrowBackClick = backBtnClick,
+                        title = "Records"
+                    )
+                }
+                item{
+                    Text(text="Record is Empty")
+                }
+            }
             item{
                 BackArrowRow(
                     onArrowBackClick = backBtnClick,
-                    title = selectedRecordFullInfo[forRecordsState.titleColumnIndex]
+                    title = selectedRecordFullInfo[forRecordsState.titleColumnIndex-1]
                 )
             }
             item{
                 RecordSmartCard(
-                    title = selectedRecordFullInfo[forRecordsState.titleColumnIndex],
-                    subHeader = selectedRecordFullInfo[forRecordsState.categoryColumn],
+                    title = selectedRecordFullInfo[forRecordsState.titleColumnIndex-1],
+                    subHeader = selectedRecordFullInfo[forRecordsState.categoryColumn-1],
                     size=270,
-                    photo = if(forRecordsState.covImgRecordsIndex!=null) selectedRecordFullInfo[forRecordsState.covImgRecordsIndex!!]
+                    photo = if(forRecordsState.covImgRecordsIndex!=null) selectedRecordFullInfo[forRecordsState.covImgRecordsIndex!!-1]
                     else null,
                     onCardClick = {}
                 )
             }
             itemsIndexed(selectedRecordFullInfo){ index, columnInfo ->
-                val isDisplayInfo = (index==forRecordsState.titleColumnIndex) || (index == forRecordsState.categoryColumn)
+                val isDisplayInfo = (index==forRecordsState.titleColumnIndex-1) || (index == forRecordsState.categoryColumn-1)
                 val isPhoto = index == forRecordsState.covImgRecordsIndex
                 if(!isDisplayInfo && !isPhoto){
                     MultiTextCard(

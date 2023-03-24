@@ -4,31 +4,23 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.melonlemon.catalogueapp.R
-import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
 import com.melonlemon.catalogueapp.feature_catalogue.domain.util.CheckStatusAddStr
 import com.melonlemon.catalogueapp.feature_catalogue.domain.util.TransactionCheckStatus
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.BackArrowRow
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.LineTextCard
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.TextInputAdd
-import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -112,15 +104,16 @@ fun AddFolderScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ){
 
-                itemsIndexed(foldersInfoState.listOfFolders){ index, folder ->
+
+
+                items(
+                    items = foldersInfoState.listOfFolders.filter { it.id != viewModel.constantFolderId },
+                    key = { item -> item.id}
+                ){ folder ->
+
                     val dismissState = rememberDismissState(
                         confirmValueChange = {
-                            if(it == DismissValue.DismissedToEnd || it == DismissValue.DismissedToStart){
-                                if(folder.id!=0){
-                                    viewModel.newFolderScreenEvents(NewFolderEvents.DeleteFolder(folder.id))
-                                }
-
-                            }
+                            viewModel.newFolderScreenEvents(NewFolderEvents.DeleteFolder(folder.id))
                             true
                         }
                     )
@@ -159,6 +152,17 @@ fun AddFolderScreen(
                     )
 
                 }
+
+                // Add Folder Others Last after all Folders
+                if(foldersInfoState.listOfFolders.isNotEmpty()){
+                    item {
+                        LineTextCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = foldersInfoState.listOfFolders.filter { it.id== viewModel.constantFolderId }[0].name
+                        )
+                    }
+                }
+
             }
 
         }

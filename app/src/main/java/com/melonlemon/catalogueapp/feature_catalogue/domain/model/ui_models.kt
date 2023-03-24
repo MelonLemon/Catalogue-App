@@ -38,6 +38,7 @@ data class FileInfo(
 
 data class InfoForLoading(
     val sheetsId: String,
+    val sheetsName: String,
     val titleColumnIndex: Int,
     val subHeaderColumnIndex: Int,
     val categoryColumnIndex: Int,

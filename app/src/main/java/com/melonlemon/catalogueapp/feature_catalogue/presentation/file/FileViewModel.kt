@@ -3,7 +3,6 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.file
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.melonlemon.catalogueapp.feature_catalogue.domain.model.RecordInfo
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,6 +26,12 @@ class FileViewModel @Inject constructor(
     private val _forRecordsState = MutableStateFlow(ForRecordsState())
     val forRecordsState = _forRecordsState.asStateFlow()
 
+    private val _isDownloading = MutableStateFlow(true)
+    val isDownloading = _isDownloading.asStateFlow()
+
+    private val _recordClick = MutableStateFlow(false)
+    val recordClick = _recordClick.asStateFlow()
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _listOfRecords = forRecordsState.flatMapLatest{ forRecordsState ->
         useCases.getRecords(
@@ -39,19 +44,22 @@ class FileViewModel @Inject constructor(
     @OptIn(FlowPreview::class)
     val listOfRecords = searchText
         .debounce(500L)
+        .onEach { _isDownloading.update { true } }
         .combine(_listOfRecords)
     { searchText, listOfRecords  ->
         useCases.getFilteredList(
             listCards = listOfRecords,
             searchText = searchText
         )
-    }.stateIn(
+    }
+        .onEach { _isDownloading.update { false } }
+        .stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         _listOfRecords.value
     )
 
-    private val _selectedRecordFullInfo = MutableStateFlow<List<String>>(emptyList())
+    private val _selectedRecordFullInfo = MutableStateFlow<List<String>>(listOf("Record"))
     val selectedRecordFullInfo = _selectedRecordFullInfo.asStateFlow()
 
     private val _columnsTitles = MutableStateFlow<List<String>>(emptyList())
@@ -62,16 +70,17 @@ class FileViewModel @Inject constructor(
         val title = savedStateHandle.get<String>("title")
         viewModelScope.launch {
             if(fileId!=null){
-
                 val infoForLoading = useCases.getInfoForLoading(fileId)
                 //separate changing part with not changing part
                 _forRecordsState.value = forRecordsState.value.copy(
                     fileId = fileId,
                     sheetId = infoForLoading.sheetsId,
+                    sheetsName = infoForLoading.sheetsName,
                     titleColumnIndex = infoForLoading.titleColumnIndex,
                     subHeaderColumnIndex = infoForLoading.subHeaderColumnIndex,
                     categoryColumn = infoForLoading.categoryColumnIndex,
-                    numberOfColumns = infoForLoading.numberOfColumns
+                    numberOfColumns = infoForLoading.numberOfColumns,
+                    covImgRecordsIndex = infoForLoading.covImgRecordsIndex
                 )
                 val listCategories = useCases.getFileCategories(
                     sheetId =  infoForLoading.sheetsId,
@@ -103,7 +112,8 @@ class FileViewModel @Inject constructor(
                 val newList = forRecordsState.value.listOfSelectedCategories.toMutableList()
                 if(event.tag in newList) newList.remove(event.tag) else newList.add(event.tag)
                 _forRecordsState.value = forRecordsState.value.copy(
-                    listOfSelectedCategories = newList
+                    listOfSelectedCategories = newList,
+                    isAllCategoriesSelected = false
                 )
             }
             is FileScreenEvents.OnRecordSelect -> {
@@ -113,9 +123,17 @@ class FileViewModel @Inject constructor(
                         numColumns = forRecordsState.value.numberOfColumns
                     )
                     _selectedRecordFullInfo.value = listOfRecords.value[event.index]
+                    if(selectedRecordFullInfo.value.isNotEmpty()){
+                        _recordClick.value = true
+                    }
+
                 }
 
             }
+            is FileScreenEvents.RecordClickRefresh -> {
+                _recordClick.value = false
+            }
+
 
         }
     }

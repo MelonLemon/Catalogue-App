@@ -55,4 +55,5 @@
     <string name="category">Category</string>
     <string name="column">column</string>
     <string name="save">Save</string>
+    <string name="google_sheet_name">Enter Google Sheet Name of Sheet</string>
 </resources>

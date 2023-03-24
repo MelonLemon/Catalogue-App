@@ -2,6 +2,8 @@ package com.melonlemon.catalogueapp.feature_catalogue.data.data_source
 
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.melonlemon.catalogueapp.feature_catalogue.data.util.CONSTANT_FOLDER_ID
+import com.melonlemon.catalogueapp.feature_catalogue.data.util.CONSTANT_FOLDER_NAME
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.Files
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.Folders
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +40,7 @@ class DatabaseInitializer(
             Folders(id=2, name="Movies")
         )
         catalogueProvider.get().addFolder(
-            Folders(id=3, name="Others")
+            Folders(id=CONSTANT_FOLDER_ID, name=CONSTANT_FOLDER_NAME)
         )
     }
     private suspend fun populateFiles() {
@@ -48,6 +50,7 @@ class DatabaseInitializer(
                 name="Music for sleep",
                 folderId = 1,
                 sheetsId = "1ZLxdPbjzrA-lDLjVuYvvsu_zFdIzlwPxymD-qZtvOr4",
+                sheetsName = "Meditation Music",
                 numColumns = 4,
                 titleColumnIndex = 1,
                 subHeaderColumnIndex = 4,
@@ -63,6 +66,7 @@ class DatabaseInitializer(
                 name="Korean Food",
                 folderId = 3,
                 sheetsId = "1BSJ0-8dWzSM-TUBeNp-KYGFs5uTmJ4WPIsW3ENdvxqQ",
+                sheetsName = "korean food",
                 numColumns = 4,
                 titleColumnIndex = 1,
                 subHeaderColumnIndex = 4,
@@ -78,6 +82,7 @@ class DatabaseInitializer(
                 name="Nasa",
                 folderId = 3,
                 sheetsId = "1N-tIjv34uIOEosAExNkkSWCd9n--ybTVpgOxiHeGoZE",
+                sheetsName = "Сoaster for a cup",
                 numColumns = 3,
                 titleColumnIndex = 1,
                 subHeaderColumnIndex = 2,

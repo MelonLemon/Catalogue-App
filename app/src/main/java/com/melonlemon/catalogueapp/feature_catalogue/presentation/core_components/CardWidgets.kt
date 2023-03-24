@@ -198,9 +198,12 @@ fun RecordSmartCard(
 
         ) {
             if(photo!=null){
+                val videoId = photo.replace("https://www.youtube.com/watch?v=", "")
+                val photoDisplay = if(photo.contains("https://www.youtube.com/watch?v="))
+                    "https://img.youtube.com/vi/$videoId/hqdefault.jpg" else photo
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(photo)
+                        .data(photoDisplay)
                         .crossfade(true)
                         .build(),
                     placeholder = painterResource(R.drawable.placeholder),
@@ -236,16 +239,16 @@ fun RecordSmartCard(
 
                 Text(
                     text = title,
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.bodyLarge
+                    color = MaterialTheme.colorScheme.onSurface,
+                    style = MaterialTheme.typography.titleMedium,
+                    textAlign = TextAlign.End
                 )
-                Text(
-                    text = subHeader,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-
             }
+            Text(
+                text = subHeader,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium
+            )
 
         }
     }

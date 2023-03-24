@@ -3,9 +3,7 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.melonlemon.catalogueapp.feature_catalogue.domain.model.FileInfo
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.Files
-import com.melonlemon.catalogueapp.feature_catalogue.domain.model.InfoForLoading
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
 import com.melonlemon.catalogueapp.feature_catalogue.domain.util.TransactionCheckStatus
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.*
@@ -32,6 +30,7 @@ class AddEditFileViewModel @Inject constructor(
         name="",
         folderId = -1,
         sheetsId = "",
+        sheetsName = "",
         numColumns = 0,
         titleColumnIndex = 0,
         subHeaderColumnIndex = 0,
@@ -48,6 +47,8 @@ class AddEditFileViewModel @Inject constructor(
     private val _columnsDialogState = MutableStateFlow(ColumnsDialogState())
     val columnsDialogState = _columnsDialogState.asStateFlow()
 
+    private val _rightsCheck = MutableStateFlow<TransactionCheckStatus>(TransactionCheckStatus.UnCheckedStatus)
+    val rightsCheck = _rightsCheck.asStateFlow()
 
 
     private val _saveNewFile = MutableStateFlow(false)
@@ -88,11 +89,21 @@ class AddEditFileViewModel @Inject constructor(
                 )
             }
 
-            is AddEditFileEvents.FullUrlExistingFileChange -> {
+            is AddEditFileEvents.OnSheetsIdChange -> {
                 _authenticationState.value = authenticationState.value.copy(
-                    fullUrlExistingFile = event.urlString
+                    sheetsId = event.idString
                 )
             }
+            is AddEditFileEvents.OnSheetsNameChange -> {
+                _authenticationState.value = authenticationState.value.copy(
+                    sheetsName = event.name
+                )
+            }
+            is AddEditFileEvents.OnRightCheckRefresh -> {
+                _rightsCheck.value = TransactionCheckStatus.UnCheckedStatus
+            }
+
+
             is AddEditFileEvents.OnNumColumnChange -> {
                 _authenticationState.value = authenticationState.value.copy(
                     numColumn = event.num
@@ -100,13 +111,14 @@ class AddEditFileViewModel @Inject constructor(
             }
             is AddEditFileEvents.OnPathCheckBtnClick -> {
                 viewModelScope.launch {
-                    val result = useCases.getFirstRow(
-                        sheetsId = fileInfo.value.sheetsId,
-                        number = fileInfo.value.numColumns
+                    val result = useCases.checkUrlValidation(
+                        sheetsId = authenticationState.value.sheetsId,
+                        sheetsName = authenticationState.value.sheetsName
                     )
                     _authenticationState.value = authenticationState.value.copy(
-                        checkStatusRights = result.first == TransactionCheckStatus.SuccessStatus
+                        checkStatusRights = result == TransactionCheckStatus.SuccessStatus
                     )
+                    _rightsCheck.value = result
                 }
             }
             is AddEditFileEvents.OnColumnCheckBtnClick -> {
@@ -114,6 +126,7 @@ class AddEditFileViewModel @Inject constructor(
                     viewModelScope.launch {
                         val result = useCases.getFirstRow(
                             sheetsId = fileInfo.value.sheetsId,
+                            sheetsName = fileInfo.value.sheetsName,
                             number = fileInfo.value.numColumns
                         )
                         _authenticationState.value = authenticationState.value.copy(

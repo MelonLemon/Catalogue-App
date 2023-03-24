@@ -4,8 +4,10 @@ sealed class AddEditFileEvents{
     //Authentication
     object OnNextBtnClick: AddEditFileEvents()
     object AuthenticationStatusRefresh: AddEditFileEvents()
-    data class FullUrlExistingFileChange(val urlString: String): AddEditFileEvents()
+    data class OnSheetsIdChange(val idString: String): AddEditFileEvents()
+    data class OnSheetsNameChange(val name: String): AddEditFileEvents()
     data class OnNumColumnChange(val num: Int): AddEditFileEvents()
+    object OnRightCheckRefresh: AddEditFileEvents()
     object OnPathCheckBtnClick: AddEditFileEvents()
     object OnColumnCheckBtnClick: AddEditFileEvents()
     //Content

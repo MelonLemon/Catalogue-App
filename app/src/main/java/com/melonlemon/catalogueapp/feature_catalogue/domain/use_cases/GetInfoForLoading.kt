@@ -14,6 +14,7 @@ class GetInfoForLoading(
 
         return InfoForLoading(
             sheetsId = file.sheetsId,
+            sheetsName = file.sheetsName,
             titleColumnIndex = file.titleColumnIndex,
             subHeaderColumnIndex = file.subHeaderColumnIndex,
             categoryColumnIndex = file.categoryColumnIndex,

@@ -7,12 +7,13 @@ import com.melonlemon.catalogueapp.feature_catalogue.domain.util.CheckStatusAddS
 class AddNewFolder(
     private val repository: CatalogueRepository
 ) {
-    suspend operator fun invoke(name: String, currentFolder: List<CategoryInfo>): CheckStatusAddStr {
-        if(name.isNotBlank()){
-            val isDuplicate = name in currentFolder.map{ it.name }
+    suspend operator fun invoke(newName: String, currentFolder: List<CategoryInfo>): CheckStatusAddStr {
+        if(newName.isNotBlank()){
+            val listOfCategories = currentFolder.map { it.name.lowercase() }
+            val isDuplicate = newName.lowercase().trimStart() in listOfCategories
             if(!isDuplicate){
                 try {
-                    repository.addNewFolder(name)
+                    repository.addNewFolder(newName)
                 } catch (e: Exception){
                     return CheckStatusAddStr.UnKnownFailStatus
                 }

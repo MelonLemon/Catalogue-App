@@ -21,5 +21,5 @@ interface CatalogueRepository {
 
     suspend fun deleteFolder(folderId: Int)
 
-
+    suspend fun getConstantFolderId(): Int
 }

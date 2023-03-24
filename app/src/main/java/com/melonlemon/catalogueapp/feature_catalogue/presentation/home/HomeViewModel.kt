@@ -1,7 +1,5 @@
 package com.melonlemon.catalogueapp.feature_catalogue.presentation.home
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
@@ -34,6 +32,13 @@ class HomeViewModel  @Inject constructor(
     private val _selectedFolderId = MutableStateFlow(-1)
     val selectedFolderId = _selectedFolderId.asStateFlow()
 
+    private val _isDownloading = MutableStateFlow(true)
+    val isDownloading = _isDownloading.asStateFlow()
+
+    //Constant Folder that it's not deletedable, we get it's value by useCases.getConstantFolderId in Init Block
+    //For now it's -1
+    // The Id and name of constant folder is in data layer, in Data constant file
+    var constantFolderId = -1
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val _listOfFiles = selectedFolderId.flatMapLatest{ folderId ->
@@ -46,13 +51,16 @@ class HomeViewModel  @Inject constructor(
     @OptIn(FlowPreview::class)
     val listOfFiles = searchText
         .debounce(500L)
+        .onEach { _isDownloading.update { true } }
         .combine(_listOfFiles)
     { searchText, listOfFiles  ->
         useCases.getFilteredFiles(
             listCards = listOfFiles,
             searchText = searchText
         )
-    }.stateIn(
+    }
+        .onEach { _isDownloading.update { false } }
+        .stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
         _listOfFiles.value
@@ -60,7 +68,18 @@ class HomeViewModel  @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val listOfFolders = useCases.getFolders()
+            var listOfFolders = useCases.getFolders()
+
+            //In first launch of App, it will return empty List. As bd is not pre-populated.
+            //That's why we will create loop till we will receive not empty List
+            // After that list of Folders can't be empty as it will always return
+            // at least 1 constant folder. User can't delete constant folder.
+            if(listOfFolders.isEmpty()){
+                while(listOfFolders.isEmpty()){
+                    listOfFolders = useCases.getFolders()
+                }
+            }
+            constantFolderId = useCases.getConstantFolderId()
             _foldersInfoState.value = foldersInfoState.value.copy(
                 listOfFolders = listOfFolders
             )
@@ -161,6 +180,17 @@ class HomeViewModel  @Inject constructor(
             is NewFolderEvents.DeleteFolder -> {
                 viewModelScope.launch {
                     val result = useCases.deleteFolder(event.id)
+                    if(result==TransactionCheckStatus.SuccessStatus){
+                        var listOfFolders = useCases.getFolders()
+                        _foldersInfoState.value = foldersInfoState.value.copy(
+                            listOfFolders = listOfFolders
+                        )
+                        _deleteFolderCheckState.value = result
+                    } else {
+                        _deleteFolderCheckState.value = result
+                    }
+
+
                 }
             }
 

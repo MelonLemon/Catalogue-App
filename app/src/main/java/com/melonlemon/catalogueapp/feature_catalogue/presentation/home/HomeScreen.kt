@@ -1,9 +1,11 @@
 package com.melonlemon.catalogueapp.feature_catalogue.presentation.home
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -15,22 +17,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.melonlemon.catalogueapp.R
-import com.melonlemon.catalogueapp.feature_catalogue.data.repository.CatalogueRepositoryImpl
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
-import com.melonlemon.catalogueapp.feature_catalogue.domain.util.CheckStatusAddStr
 import com.melonlemon.catalogueapp.feature_catalogue.domain.util.TransactionCheckStatus
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.BasicButton
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.DeleteCard
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SearchInput
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.SmartCard
-import com.melonlemon.catalogueapp.ui.theme.CatalogueAppTheme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +45,7 @@ fun HomeScreen(
     val foldersInfoState by viewModel.foldersInfoState.collectAsStateWithLifecycle()
     val listOfFiles by viewModel.listOfFiles.collectAsStateWithLifecycle()
     val deleteState by viewModel.deleteState.collectAsStateWithLifecycle()
+    val isDownloading by viewModel.isDownloading.collectAsStateWithLifecycle()
 
     val errorMessages = mapOf(
         TransactionCheckStatus.BlankParameterFailStatus to stringResource(R.string.empty_name),
@@ -54,6 +53,7 @@ fun HomeScreen(
         TransactionCheckStatus.UnKnownFailStatus to  stringResource(R.string.unknown_error)
     )
     val errorStatus = stringResource(R.string.unknown_error)
+    val density = LocalDensity.current
 
     if(deleteState.deleteCheckStatus!= TransactionCheckStatus.UnCheckedStatus){
 
@@ -73,16 +73,29 @@ fun HomeScreen(
             SnackbarHost(snackbarHostState)
         },
         floatingActionButton = {
-            FloatingActionButton(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                onClick = onAddNewFileClick,
-            ) {
-                Icon(Icons.Filled.Add, "Localized description")
+            AnimatedVisibility(visible = !deleteState.deleteState){
+                FloatingActionButton(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    onClick = onAddNewFileClick,
+                ) {
+                    Icon(Icons.Filled.Add, "Localized description")
+                }
             }
+
         },
         bottomBar = {
-            if(deleteState.deleteState){
+            AnimatedVisibility(
+                visible = deleteState.deleteState,
+                enter = slideInVertically {
+                    with(density) { 40.dp.roundToPx() }
+                } + expandVertically(
+                    expandFrom = Alignment.Bottom
+                ) + fadeIn(
+                    initialAlpha = 0.3f
+                ),
+                exit = slideOutVertically() + shrinkVertically() + fadeOut()
+            ){
                 DeleteCard(
                     modifier = Modifier.fillMaxWidth(),
                     onCancelClick = {
@@ -134,12 +147,8 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                     }
-                    items(
-                        items = foldersInfoState.listOfFolders,
-                        key = { item ->
-                            item.id
-                        }
-                    ) { item ->
+
+                    itemsIndexed(foldersInfoState.listOfFolders.filter { it.id != viewModel.constantFolderId}){ index, item ->
                         BasicButton(
                             text = item.name,
                             isSelected = selectedFolderId == item.id,
@@ -150,6 +159,21 @@ fun HomeScreen(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                     }
+                    if(foldersInfoState.listOfFolders.filter { it.id == viewModel.constantFolderId }.isNotEmpty()){
+                        item{
+                            BasicButton(
+                                text = foldersInfoState.listOfFolders.filter { it.id == viewModel.constantFolderId }[0].name,
+                                isSelected = selectedFolderId == viewModel.constantFolderId,
+                                onButtonClicked = {
+                                    viewModel.homeScreenEvents(
+                                        HomeScreenEvents.OnCategoryClick(viewModel.constantFolderId))
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
+                    }
+
+
                 }
                 Spacer(modifier = Modifier.width(8.dp))
                 Button(
@@ -171,7 +195,9 @@ fun HomeScreen(
                 }
             }
             Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp),
                verticalAlignment = Alignment.CenterVertically,
                horizontalArrangement = Arrangement.Start
             ){
@@ -198,39 +224,47 @@ fun HomeScreen(
                 )
             }
 
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ){
-                items(
-                    items = listOfFiles,
-                    key = { item ->
-                        item.id
-                    }
-                ){ file ->
-                    SmartCard(
-                        photo= file.photoPath,
-                        title=file.title,
-                        tags = file.tags,
-                        size=270,
-                        onCardClick = {
-                            onFileClick(
-                                file.id,
-                                file.title
-                            )
-                        },
-                        deleteEnabled = deleteState.deleteState,
-                        onSelect = { isSelected ->
-                            viewModel.homeScreenEvents(
-                                HomeScreenEvents.OnDeleteChosenClick(
-                                    id = file.id,
-                                    status = isSelected
-                                ))
-                        },
-                        isSelected = file.id in deleteState.deleteList
+            if(isDownloading) {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
+            } else {
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ){
+                    items(
+                        items = listOfFiles,
+                        key = { item ->
+                            item.id
+                        }
+                    ){ file ->
+                        SmartCard(
+                            photo= file.photoPath,
+                            title=file.title,
+                            tags = file.tags,
+                            size=270,
+                            onCardClick = {
+                                onFileClick(
+                                    file.id,
+                                    file.title
+                                )
+                            },
+                            deleteEnabled = deleteState.deleteState,
+                            onSelect = { isSelected ->
+                                viewModel.homeScreenEvents(
+                                    HomeScreenEvents.OnDeleteChosenClick(
+                                        id = file.id,
+                                        status = isSelected
+                                    ))
+                            },
+                            isSelected = file.id in deleteState.deleteList
+                        )
+                    }
+                }
             }
+
         }
     }
 }

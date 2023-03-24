@@ -6,12 +6,14 @@ class GetFilteredList(
 ) {
      operator fun invoke(listCards:List<List<String>>, searchText: String): List<List<String>> {
          //delete spaces in tags/title and search text
-        if(searchText.isNotBlank()){
-            return listCards.filter { file ->
-                file.contains(searchText)
-            }
-        }  else {
-            return listCards
-        }
+
+         if(searchText.isNotBlank() && listCards.isNotEmpty()){
+             return listCards.filter { file ->
+                 file.contains(searchText)
+             }
+         }  else {
+             return listCards
+         }
+
 }
 }

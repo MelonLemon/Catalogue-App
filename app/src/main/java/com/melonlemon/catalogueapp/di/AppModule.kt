@@ -72,7 +72,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideCatalogueUseCases(repository: CatalogueRepository, apiRepository: FileRepository): CatalogueUseCases {
+    fun provideCatalogueUseCases(repository: CatalogueRepository, apiRepository: FileRepository, baseUrl: String): CatalogueUseCases {
         return CatalogueUseCases(
             getFolders = GetFolders(repository),
             addNewFolder = AddNewFolder(repository),
@@ -87,7 +87,9 @@ object AppModule {
             deleteFiles = DeleteFiles(repository),
             deleteFolder = DeleteFolder(repository),
             getFirstRow = GetFirstRow(apiRepository),
-            getFileById = GetFileById(repository)
+            getFileById = GetFileById(repository),
+            getConstantFolderId = GetConstantFolderId(repository),
+            checkUrlValidation = CheckUrlValidation(baseUrl)
         )
     }
 
