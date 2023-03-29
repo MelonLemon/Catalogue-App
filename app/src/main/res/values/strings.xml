@@ -16,7 +16,7 @@
     <string name="duplicate_name">Duplicate name!</string>
     <string name="success">Success!</string>
     <string name="unknown_error">Unknown Error!</string>
-    <string name="add_file">Add File</string>
+    <string name="add_file">Add Edit File</string>
     <string name="new_file">New File</string>
     <string name="existing_file">Existing File</string>
     <string name="next">NEXT</string>
@@ -49,11 +49,23 @@
     <string name="btn_check">Check</string>
     <string name="choose_title_column">Choose Title Column.</string>
     <string name="choose_subheader_column">Choose subheader Column.</string>
-    <string name="coverimage_for_records">Choose CoverImage for Records, can be none!</string>
+    <string name="coverimage_for_records">Choose CoverImage for Records, can be none! Or standard Youtube link: "https://www.youtube.com/watch?v=[videoId]" </string>
     <string name="title">Title</string>
     <string name="sub_header">SubHeader</string>
     <string name="category">Category</string>
     <string name="column">column</string>
     <string name="save">Save</string>
     <string name="google_sheet_name">Enter Google Sheet Name of Sheet</string>
+    <string name="error_msg_sheets_id_name_empty">Sheets Id and name of sheet can\'t be empty!</string>
+    <string name="err_msg_no_rights">You do not have rights! Choose other file!</string>
+    <string name="err_msg_broken_url">Something is wrong with Url!</string>
+    <string name="valid_msg_no_rights">You do not have rights for this file!</string>
+    <string name="valid_msg_broken_url">Url is broken! Check sheets id and name of sheet. Are they still valid?</string>
+    <string name="valid_msg_general">Something goes wrong!</string>
+    <string name="no_title">No Title</string>
+    <string name="no_subheader">No Subheader</string>
+    <string name="no_records">No Records!</string>
+    <string name="no_category">No Category</string>
+    <string name="record_empty">Record is empty!</string>
+    <string name="no_text">No Text</string>
 </resources>

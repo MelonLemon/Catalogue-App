@@ -111,6 +111,7 @@ class MainActivity : ComponentActivity() {
                             FileScreen(
                                 backBtnClick = { navController.popBackStack() },
                                 onRecordClick = { navController.navigate(Screens.RecordScreen.route) },
+                                onEditClick = { fileId -> navController.navigate("${Screens.AuthenticationFileScreen.route}?fileId=${fileId}") },
                                 viewModel = viewModel
                             )
                         }

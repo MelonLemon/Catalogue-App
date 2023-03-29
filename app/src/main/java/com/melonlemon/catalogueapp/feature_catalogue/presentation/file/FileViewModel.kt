@@ -3,7 +3,9 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.file
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.melonlemon.catalogueapp.feature_catalogue.domain.model.RecordsResult
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.ValidationUrlCheckStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -39,7 +41,11 @@ class FileViewModel @Inject constructor(
     }.stateIn(
             viewModelScope,
             SharingStarted.WhileSubscribed(5000),
-            emptyList())
+        RecordsResult(
+            records = null,
+            validationUrlCheckStatus = ValidationUrlCheckStatus.UnCheckedStatus
+        )
+    )
 
     @OptIn(FlowPreview::class)
     val listOfRecords = searchText
@@ -47,10 +53,17 @@ class FileViewModel @Inject constructor(
         .onEach { _isDownloading.update { true } }
         .combine(_listOfRecords)
     { searchText, listOfRecords  ->
-        useCases.getFilteredList(
-            listCards = listOfRecords,
-            searchText = searchText
-        )
+        if(listOfRecords.records!=null){
+            val records = useCases.getFilteredList(
+                listCards = listOfRecords.records,
+                searchText = searchText
+            )
+            listOfRecords.copy(
+                records = records
+            )
+        } else {
+            listOfRecords
+        }
     }
         .onEach { _isDownloading.update { false } }
         .stateIn(
@@ -122,7 +135,7 @@ class FileViewModel @Inject constructor(
                         sheetsId = forRecordsState.value.sheetId,
                         numColumns = forRecordsState.value.numberOfColumns
                     )
-                    _selectedRecordFullInfo.value = listOfRecords.value[event.index]
+                    _selectedRecordFullInfo.value = listOfRecords.value.records!![event.index]
                     if(selectedRecordFullInfo.value.isNotEmpty()){
                         _recordClick.value = true
                     }

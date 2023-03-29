@@ -13,12 +13,20 @@ class GetFileColumnTitles(
             val endRange = '@' + numColumns
             val key = BuildConfig.API_KEY
 
-            val titles = fileRepository.getRecords(
+            val fileObject = fileRepository.getRecords(
                 spreadsheetId = sheetsId,
                 range = "A1:${endRange}1",
                 apiKey = key
-            ).first().values
-            return titles[0].toMutableList()
+            ).first()
+            if(fileObject.error==null && fileObject.values!=null){
+                val titles =  fileObject.values[0]
+                if(numColumns==titles.size){
+                    return titles
+                } else {
+                   val noTitles = MutableList(numColumns - titles.size) { "" }
+                   return titles + noTitles
+                }
+            }
         }
         return emptyList()
     }

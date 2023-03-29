@@ -1,4 +1,4 @@
-package com.melonlemon.catalogueapp.feature_catalogue.data.data_source
+package com.melonlemon.catalogueapp.feature_catalogue.data.data_source.room
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -6,7 +6,6 @@ import androidx.room.TypeConverters
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.Files
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.Folders
 import com.melonlemon.catalogueapp.feature_catalogue.domain.util.Converters
-import java.io.File
 
 @Database(
     entities = [Folders::class, Files::class],

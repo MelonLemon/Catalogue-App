@@ -1,5 +1,6 @@
 package com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,12 +14,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.semantics.Role
@@ -66,6 +69,7 @@ fun BackArrowRow(
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
+
     }
 }
 
@@ -200,13 +204,14 @@ fun TextInputAdd(
 
 @Composable
 fun ColumnsDialog(
-    onSaveClick: () -> Unit,
+    onSaveClick: (Int) -> Unit,
     onCancelClick: () -> Unit,
     columnType: ColumnType,
     listColumn: List<String>,
-    selectedIndex: Int,
-    onColumnClick: (Int) -> Unit
+    selectedIndex: Int
 ) {
+
+    var temptIndex by remember { mutableStateOf(selectedIndex) }
     Dialog(
         onDismissRequest = { onCancelClick()},
     ) {
@@ -216,70 +221,90 @@ fun ColumnsDialog(
                 containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(11.dp)
             ),
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp),
                 horizontalAlignment = Alignment.Start
             ){
-                Text(
-                    text = stringResource(R.string.choose) + " " + columnType.name + " " +
-                        stringResource(R.string.column),
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ){
-                    itemsIndexed(listColumn){index, name ->
-                        SelectLineTextCard(
-                            modifier = Modifier.fillMaxWidth(),
-                            text = name,
-                            isSelected = index==selectedIndex,
-                            onCardClick = {
-                                onColumnClick(index)
-                            }
-                        )
-                        Divider(modifier = Modifier.height(1.dp),
-                            color = MaterialTheme.colorScheme.outlineVariant)
+                item{
+                    Text(
+                        text = stringResource(R.string.choose) + " " + columnType.name + " " +
+                                stringResource(R.string.column),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+                itemsIndexed(listColumn){index, name ->
+                    SelectLineTextCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = name,
+                        isSelected = index==temptIndex,
+                        onCardClick = {
+                            temptIndex = index
+                        }
+                    )
+                    Divider(modifier = Modifier.height(1.dp),
+                        color = MaterialTheme.colorScheme.outlineVariant)
+                }
+
+                item {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End
+                    ){
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent
+                            ),
+                            onClick = { onCancelClick() }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.cancel),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Transparent
+                            ),
+                            onClick = { onSaveClick(temptIndex) }
+                        ) {
+                            Text(
+                                text = stringResource(R.string.save),
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
-                ){
-                    Button(
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = { onCancelClick() }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.cancel),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Button(
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent
-                        ),
-                        onClick = { onSaveClick() }
-                    ) {
-                        Text(
-                            text = stringResource(R.string.save),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
+
             }
         }
 
     }
     
+}
+
+@Composable
+fun ErrorMsgView(
+    modifier: Modifier = Modifier,
+    text: String,
+    imageBitmap: ImageBitmap
+) {
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier.padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ){
+            Text(text= text)
+            Image(bitmap = imageBitmap, contentDescription = null)
+        }
+    }
 }
 
 @Preview(showBackground = true)
@@ -309,8 +334,6 @@ fun ColumnsDialogPreview() {
             columnType = ColumnType.TitleColumn("Example"),
             listColumn = listOf("Example1", "Example2", "Example3"),
             selectedIndex = 1,
-            onColumnClick = {
-            }
         )
     }
 }

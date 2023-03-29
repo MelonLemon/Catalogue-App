@@ -8,7 +8,8 @@ class GetFileCategories(
 ) {
     suspend operator fun invoke(sheetId: String, categoryColumnIndex: Int): List<String> {
 
-        val letterColum = '@' + categoryColumnIndex
+        //Add 1 as it's index not column number
+        val letterColum = '@' + (categoryColumnIndex + 1)
         val key = BuildConfig.API_KEY
         val fileObject = fileRepository.getColumn(
             spreadsheetId = sheetId,
@@ -16,8 +17,11 @@ class GetFileCategories(
             apiKey = key
         )
         val records = fileObject.values
-        val columns = if(records.isNotEmpty()) records[0] else emptyList()
-        return  columns.drop(1).distinct()
-
+        if(records!=null){
+            val columns = if(records.isNotEmpty()) records[0] else emptyList()
+            return  columns.drop(1).distinct()
+        } else {
+            return emptyList()
+        }
     }
 }

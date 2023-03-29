@@ -1,5 +1,7 @@
 package com.melonlemon.catalogueapp.feature_catalogue.domain.model
 
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.ValidationUrlCheckStatus
+
 data class CardInfo(
     val id: Int,
     val hostId: Int,
@@ -44,4 +46,9 @@ data class InfoForLoading(
     val categoryColumnIndex: Int,
     val covImgRecordsIndex: Int?=null,
     val numberOfColumns: Int
+)
+
+data class RecordsResult(
+    val records: List<List<String>>?,
+    val validationUrlCheckStatus: ValidationUrlCheckStatus
 )

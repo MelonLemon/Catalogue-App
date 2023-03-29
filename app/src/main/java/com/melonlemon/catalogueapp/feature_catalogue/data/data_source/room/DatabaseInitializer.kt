@@ -1,4 +1,4 @@
-package com.melonlemon.catalogueapp.feature_catalogue.data.data_source
+package com.melonlemon.catalogueapp.feature_catalogue.data.data_source.room
 
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
@@ -52,10 +52,10 @@ class DatabaseInitializer(
                 sheetsId = "1ZLxdPbjzrA-lDLjVuYvvsu_zFdIzlwPxymD-qZtvOr4",
                 sheetsName = "Meditation Music",
                 numColumns = 4,
-                titleColumnIndex = 1,
-                subHeaderColumnIndex = 4,
-                categoryColumnIndex = 3,
-                covImgRecColumnIndex = 2,
+                titleColumnIndex = 0,
+                subHeaderColumnIndex = 3,
+                categoryColumnIndex = 2,
+                covImgRecColumnIndex = 1,
                 coverImg = "https://images.unsplash.com/photo-1444312645910-ffa973656eba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
                 tags = listOf("Meditation", "Music")
             )
@@ -68,10 +68,10 @@ class DatabaseInitializer(
                 sheetsId = "1BSJ0-8dWzSM-TUBeNp-KYGFs5uTmJ4WPIsW3ENdvxqQ",
                 sheetsName = "korean food",
                 numColumns = 4,
-                titleColumnIndex = 1,
-                subHeaderColumnIndex = 4,
-                categoryColumnIndex = 4,
-                covImgRecColumnIndex = 2,
+                titleColumnIndex = 0,
+                subHeaderColumnIndex = 3,
+                categoryColumnIndex = 3,
+                covImgRecColumnIndex = 1,
                 coverImg = "https://images.unsplash.com/photo-1590301157890-4810ed352733?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=736&q=80",
                 tags = listOf("Korea", "Food")
             )
@@ -84,10 +84,10 @@ class DatabaseInitializer(
                 sheetsId = "1N-tIjv34uIOEosAExNkkSWCd9n--ybTVpgOxiHeGoZE",
                 sheetsName = "Сoaster for a cup",
                 numColumns = 3,
-                titleColumnIndex = 1,
-                subHeaderColumnIndex = 2,
-                categoryColumnIndex = 2,
-                covImgRecColumnIndex = 3,
+                titleColumnIndex = 0,
+                subHeaderColumnIndex = 1,
+                categoryColumnIndex = 1,
+                covImgRecColumnIndex = 2,
                 coverImg = "https://images.unsplash.com/photo-1484589065579-248aad0d8b13?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=759&q=80",
                 tags = listOf("Photo", "Space")
             )

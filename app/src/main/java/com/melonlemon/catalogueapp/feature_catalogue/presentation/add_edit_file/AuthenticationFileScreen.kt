@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.melonlemon.catalogueapp.R
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.*
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.TransactionCheckStatus
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.ValidationUrlCheckStatus
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.*
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.core_components.*
 
@@ -37,10 +39,34 @@ fun AuthenticationFileScreen(
         AuthenticationStatus.SuccessStatus to stringResource(R.string.success),
         AuthenticationStatus.PathFailStatus to stringResource(R.string.path_fail_status)
     )
+
+    val errorMessagesUrl = mapOf(
+        ValidationUrlCheckStatus.BlankParameterFailStatus to stringResource(R.string.error_msg_sheets_id_name_empty),
+        ValidationUrlCheckStatus.SuccessStatus to stringResource(R.string.success),
+        ValidationUrlCheckStatus.NoRightsFailStatus to stringResource(R.string.err_msg_no_rights),
+        ValidationUrlCheckStatus.BrokenUrlFailStatus to stringResource(R.string.err_msg_broken_url),
+    )
+
     val errorStatus = stringResource(R.string.unknown_error)
 
     val authenticationState by viewModel.authenticationState.collectAsStateWithLifecycle()
     val fileColumns by viewModel.fileColumns.collectAsStateWithLifecycle()
+    val fileInfo by viewModel.fileInfo.collectAsStateWithLifecycle()
+
+    val rightsCheck by viewModel.rightsCheck.collectAsStateWithLifecycle()
+
+    if(rightsCheck != ValidationUrlCheckStatus.UnCheckedStatus){
+
+        LaunchedEffect(rightsCheck){
+
+            snackbarHostState.showSnackbar(
+                message = errorMessagesUrl[rightsCheck]?: errorStatus,
+                actionLabel = null
+            )
+            viewModel.addEditFileEvents(AddEditFileEvents.OnRightCheckRefresh)
+        }
+    }
+
 
     if(authenticationState.authenticationStatus != AuthenticationStatus.UnCheckedStatus){
         LaunchedEffect(authenticationState.authenticationStatus){
@@ -57,6 +83,7 @@ fun AuthenticationFileScreen(
             }
         }
     }
+
 
 
     Scaffold(
@@ -104,57 +131,50 @@ fun AuthenticationFileScreen(
             }
 
             item {
-                Row(
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.End
                 ){
-                    Column(
-                        verticalArrangement = Arrangement.Top,
-                        horizontalAlignment = Alignment.Start
-                    ){
-                        OutlinedTextField(
-                            modifier = Modifier.weight(1f),
-                            value = authenticationState.sheetsId,
-                            onValueChange = { idString ->
-                                viewModel.addEditFileEvents(
-                                    AddEditFileEvents.OnSheetsIdChange(idString))
-                            },
-                            shape = MaterialTheme.shapes.extraSmall,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                            ),
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Uri
-                            ),
-                            placeholder = {
-                                Text(
-                                    text = stringResource(R.string.type_link)
-                                )
-                            },
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier.weight(1f),
-                            value = authenticationState.sheetsName,
-                            onValueChange = { name ->
-                                viewModel.addEditFileEvents(
-                                    AddEditFileEvents.OnSheetsNameChange(name))
-                            },
-                            shape = MaterialTheme.shapes.extraSmall,
-                            colors = TextFieldDefaults.outlinedTextFieldColors(
-                                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                                unfocusedBorderColor = MaterialTheme.colorScheme.outline
-                            ),
-                            placeholder = {
-                                Text(
-                                    text = stringResource(R.string.google_sheet_name)
-                                )
-                            },
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = fileInfo.sheetsId,
+                        onValueChange = { idString ->
+                            viewModel.addEditFileEvents(
+                                AddEditFileEvents.OnSheetsIdChange(idString))
+                        },
+                        shape = MaterialTheme.shapes.extraSmall,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        ),
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Uri
+                        ),
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.type_link)
+                            )
+                        },
+                    )
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = fileInfo.sheetsName,
+                        onValueChange = { name ->
+                            viewModel.addEditFileEvents(
+                                AddEditFileEvents.OnSheetsNameChange(name))
+                        },
+                        shape = MaterialTheme.shapes.extraSmall,
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline
+                        ),
+                        placeholder = {
+                            Text(
+                                text = stringResource(R.string.google_sheet_name)
+                            )
+                        },
+                    )
                     Button(
                         contentPadding = PaddingValues(8.dp),
                         shape = MaterialTheme.shapes.small,
@@ -202,11 +222,11 @@ fun AuthenticationFileScreen(
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ){
                         OutlinedTextField(
-                            modifier = Modifier,
-                            value = if(authenticationState.numColumn!=0) authenticationState.numColumn.toString()
+                            modifier = Modifier.width(100.dp),
+                            value = if(fileInfo.numColumns!=0) fileInfo.numColumns.toString()
                             else "",
                             onValueChange = { numberString ->
                                 viewModel.addEditFileEvents(
@@ -251,8 +271,10 @@ fun AuthenticationFileScreen(
                 }
                 items(fileColumns){ name ->
                     LineTextCard(
+                        modifier = Modifier.fillMaxWidth(),
                         text = name
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }

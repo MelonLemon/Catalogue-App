@@ -26,12 +26,16 @@ class GetFirstRow(
 
         val endRange = '@' + number
         return try {
-            val result = fileRepository.getRecords(
+            val fileObject = fileRepository.getRecords(
                 spreadsheetId = sheetsId,
                 range = "$sheetName!A1:${endRange}1",
                 apiKey = key
-            ).first().values
-            Pair(TransactionCheckStatus.SuccessStatus, result[0])
+            ).first()
+            if(fileObject.error==null && fileObject.values!=null){
+                Pair(TransactionCheckStatus.SuccessStatus, fileObject.values[0])
+            } else {
+                Pair(TransactionCheckStatus.UnKnownFailStatus, null)
+            }
         } catch (e: Exception){
             Pair(TransactionCheckStatus.UnKnownFailStatus, null)
         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.Files
 import com.melonlemon.catalogueapp.feature_catalogue.domain.use_cases.CatalogueUseCases
 import com.melonlemon.catalogueapp.feature_catalogue.domain.util.TransactionCheckStatus
+import com.melonlemon.catalogueapp.feature_catalogue.domain.util.ValidationUrlCheckStatus
 import com.melonlemon.catalogueapp.feature_catalogue.presentation.add_edit_file.util.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,7 +48,7 @@ class AddEditFileViewModel @Inject constructor(
     private val _columnsDialogState = MutableStateFlow(ColumnsDialogState())
     val columnsDialogState = _columnsDialogState.asStateFlow()
 
-    private val _rightsCheck = MutableStateFlow<TransactionCheckStatus>(TransactionCheckStatus.UnCheckedStatus)
+    private val _rightsCheck = MutableStateFlow<ValidationUrlCheckStatus>(ValidationUrlCheckStatus.UnCheckedStatus)
     val rightsCheck = _rightsCheck.asStateFlow()
 
 
@@ -56,6 +57,7 @@ class AddEditFileViewModel @Inject constructor(
 
     init{
         val fileId = savedStateHandle.get<Int>("fileId")
+
         viewModelScope.launch {
             val listOfFolders = useCases.getFolders()
             _addEditFileState.value = addEditFileState.value.copy(
@@ -64,7 +66,16 @@ class AddEditFileViewModel @Inject constructor(
             if(fileId!=-1 && fileId!=null){
                 val file = useCases.getFileById(fileId)
                 _fileInfo.value = file
+                val result = useCases.checkUrlValidation(
+                    sheetsId = fileInfo.value.sheetsId,
+                    sheetsName = fileInfo.value.sheetsName
+                )
+                _authenticationState.value = authenticationState.value.copy(
+                    checkStatusRights = result == ValidationUrlCheckStatus.SuccessStatus,
+                )
             }
+
+
         }
     }
 
@@ -72,10 +83,50 @@ class AddEditFileViewModel @Inject constructor(
         when(event) {
             //Authentication
             is AddEditFileEvents.OnNextBtnClick -> {
-                if(authenticationState.value.checkStatusRights && authenticationState.value.numColumn!=0){
-                    _authenticationState.value = authenticationState.value.copy(
-                        authenticationStatus = AuthenticationStatus.SuccessStatus
-                    )
+
+                if(authenticationState.value.checkStatusRights && _fileInfo.value.numColumns!=0){
+                    if(fileColumns.value.isEmpty()){
+                        viewModelScope.launch {
+                            val result = useCases.getFirstRow(
+                                sheetsId = fileInfo.value.sheetsId,
+                                sheetsName = fileInfo.value.sheetsName,
+                                number = fileInfo.value.numColumns
+                            )
+                            if(result.first == TransactionCheckStatus.SuccessStatus){
+                                _authenticationState.value = authenticationState.value.copy(
+                                    checkStatusRights = true,
+                                    checkStatusNumColumn = true
+                                )
+                                val columnsList = result.second
+                                _fileColumns.value = if(columnsList!!.isEmpty()) List(fileInfo.value.numColumns){""}
+                                else columnsList
+                                _authenticationState.value = authenticationState.value.copy(
+                                    authenticationStatus = AuthenticationStatus.SuccessStatus
+                                )
+                                _addEditFileState.value = addEditFileState.value.copy(
+                                    coverImgCheckStatus = fileInfo.value.coverImg != ""
+                                )
+                                //check columns index in range of column number
+                                //in range stay not in range change to 0 index
+                            } else {
+                                //not success- change
+                                _authenticationState.value = authenticationState.value.copy(
+                                    checkStatusRights = result.first == TransactionCheckStatus.SuccessStatus,
+                                    checkStatusNumColumn = result.first == TransactionCheckStatus.SuccessStatus
+                                )
+                                val columnsList = if(result.first == TransactionCheckStatus.SuccessStatus)
+                                    result.second else emptyList()
+                                _fileColumns.value = columnsList ?:emptyList()
+
+                                _authenticationState.value = authenticationState.value.copy(
+                                    authenticationStatus = AuthenticationStatus.SuccessStatus
+                                )
+                            }
+
+
+                        }
+                    }
+
                 } else {
                     _authenticationState.value = authenticationState.value.copy(
                         authenticationStatus = if(!authenticationState.value.checkStatusRights) AuthenticationStatus.NoRightsFailStatus else
@@ -90,39 +141,45 @@ class AddEditFileViewModel @Inject constructor(
             }
 
             is AddEditFileEvents.OnSheetsIdChange -> {
-                _authenticationState.value = authenticationState.value.copy(
+                _fileInfo.value = fileInfo.value.copy(
                     sheetsId = event.idString
+                )
+                _authenticationState.value = authenticationState.value.copy(
+                    checkStatusRights = false
                 )
             }
             is AddEditFileEvents.OnSheetsNameChange -> {
-                _authenticationState.value = authenticationState.value.copy(
+                _fileInfo.value = fileInfo.value.copy(
                     sheetsName = event.name
+                )
+                _authenticationState.value = authenticationState.value.copy(
+                    checkStatusRights = false
                 )
             }
             is AddEditFileEvents.OnRightCheckRefresh -> {
-                _rightsCheck.value = TransactionCheckStatus.UnCheckedStatus
+                _rightsCheck.value = ValidationUrlCheckStatus.UnCheckedStatus
             }
 
 
             is AddEditFileEvents.OnNumColumnChange -> {
-                _authenticationState.value = authenticationState.value.copy(
-                    numColumn = event.num
+                _fileInfo.value = fileInfo.value.copy(
+                    numColumns = event.num
                 )
             }
             is AddEditFileEvents.OnPathCheckBtnClick -> {
                 viewModelScope.launch {
                     val result = useCases.checkUrlValidation(
-                        sheetsId = authenticationState.value.sheetsId,
-                        sheetsName = authenticationState.value.sheetsName
+                        sheetsId = fileInfo.value.sheetsId,
+                        sheetsName = fileInfo.value.sheetsName
                     )
                     _authenticationState.value = authenticationState.value.copy(
-                        checkStatusRights = result == TransactionCheckStatus.SuccessStatus
+                        checkStatusRights = result == ValidationUrlCheckStatus.SuccessStatus
                     )
                     _rightsCheck.value = result
                 }
             }
             is AddEditFileEvents.OnColumnCheckBtnClick -> {
-                if(authenticationState.value.numColumn!=0){
+                if(fileInfo.value.numColumns!=0){
                     viewModelScope.launch {
                         val result = useCases.getFirstRow(
                             sheetsId = fileInfo.value.sheetsId,
@@ -130,7 +187,8 @@ class AddEditFileViewModel @Inject constructor(
                             number = fileInfo.value.numColumns
                         )
                         _authenticationState.value = authenticationState.value.copy(
-                            checkStatusRights = result.first == TransactionCheckStatus.SuccessStatus
+                            checkStatusRights = result.first == TransactionCheckStatus.SuccessStatus,
+                            checkStatusNumColumn = result.first == TransactionCheckStatus.SuccessStatus
                         )
                         val columnsList = if(result.first == TransactionCheckStatus.SuccessStatus)
                             result.second else emptyList()
@@ -163,36 +221,28 @@ class AddEditFileViewModel @Inject constructor(
                     columnType = event.columnType
                 )
             }
-            is AddEditFileEvents.OnColumnDialogClick -> {
-                _columnsDialogState.value = columnsDialogState.value.copy(
-                    selectedIndex = event.index
-                )
-            }
-            is AddEditFileEvents.OnCancelDialogClick -> {
-                _columnsDialogState.value = columnsDialogState.value.copy(
-                    selectedIndex = 0
-                )
-            }
+
+
             is AddEditFileEvents.OnSaveDialogClick -> {
-                when(columnsDialogState.value.columnType){
+                when(event.columnType){
                     is ColumnType.TitleColumn -> {
                         _fileInfo.value = fileInfo.value.copy(
-                            titleColumnIndex = columnsDialogState.value.selectedIndex
+                            titleColumnIndex = event.index
                         )
                     }
                     is ColumnType.SubHeaderColumn -> {
                         _fileInfo.value = fileInfo.value.copy(
-                            subHeaderColumnIndex = columnsDialogState.value.selectedIndex
+                            subHeaderColumnIndex = event.index
                         )
                     }
                     is ColumnType.CategoryColumn -> {
                         _fileInfo.value = fileInfo.value.copy(
-                            categoryColumnIndex = columnsDialogState.value.selectedIndex
+                            categoryColumnIndex = event.index
                         )
                     }
                     is ColumnType.CovImgRecordColumn -> {
                         _fileInfo.value = fileInfo.value.copy(
-                            covImgRecColumnIndex = columnsDialogState.value.selectedIndex
+                            covImgRecColumnIndex = event.index
                         )
                     }
                 }
@@ -205,22 +255,26 @@ class AddEditFileViewModel @Inject constructor(
             }
             is AddEditFileEvents.OnTagAddBtnClick -> {
                 if(addEditFileState.value.newTag.isNotBlank()){
-                    val newListTags = fileInfo.value.tags.toMutableList()
-                    newListTags.add(addEditFileState.value.newTag)
+                    val isDistinct = addEditFileState.value.newTag.lowercase() !in fileInfo.value.tags.map { it.lowercase() }
+                    if(addEditFileState.value.newTag.isNotBlank() && isDistinct ){
+                        val newListTags = fileInfo.value.tags.toMutableList()
+                        newListTags.add(addEditFileState.value.newTag)
 
-                    if(!addEditFileState.value.tagCheckStatus) {
-                        _addEditFileState.value = addEditFileState.value.copy(
-                            newTag = "",
-                            tagCheckStatus = true
-                        )
-                    } else {
-                        _addEditFileState.value = addEditFileState.value.copy(
-                            newTag = ""
+                        if(!addEditFileState.value.tagCheckStatus) {
+                            _addEditFileState.value = addEditFileState.value.copy(
+                                newTag = "",
+                                tagCheckStatus = true
+                            )
+                        } else {
+                            _addEditFileState.value = addEditFileState.value.copy(
+                                newTag = ""
+                            )
+                        }
+                        _fileInfo.value = fileInfo.value.copy(
+                            tags = newListTags
                         )
                     }
-                    _fileInfo.value = fileInfo.value.copy(
-                        tags = newListTags
-                    )
+
                 }
             }
             is AddEditFileEvents.OnSaveFabClick -> {

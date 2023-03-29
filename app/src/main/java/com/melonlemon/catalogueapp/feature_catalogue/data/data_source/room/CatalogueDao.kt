@@ -1,4 +1,4 @@
-package com.melonlemon.catalogueapp.feature_catalogue.data.data_source
+package com.melonlemon.catalogueapp.feature_catalogue.data.data_source.room
 
 import androidx.room.*
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.Files

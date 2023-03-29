@@ -1,6 +1,6 @@
 package com.melonlemon.catalogueapp.feature_catalogue.data.repository
 
-import com.melonlemon.catalogueapp.feature_catalogue.data.data_source.CatalogueDao
+import com.melonlemon.catalogueapp.feature_catalogue.data.data_source.room.CatalogueDao
 import com.melonlemon.catalogueapp.feature_catalogue.data.util.CONSTANT_FOLDER_ID
 import com.melonlemon.catalogueapp.feature_catalogue.domain.model.*
 import com.melonlemon.catalogueapp.feature_catalogue.domain.repository.CatalogueRepository

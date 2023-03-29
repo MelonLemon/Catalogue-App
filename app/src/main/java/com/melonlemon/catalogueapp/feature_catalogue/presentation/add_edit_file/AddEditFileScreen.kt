@@ -54,7 +54,7 @@ fun AddEditFileScreen(
     val columnsDialogState by viewModel.columnsDialogState.collectAsStateWithLifecycle()
     val saveNewFile by viewModel.saveNewFile.collectAsStateWithLifecycle()
     val fileColumns by viewModel.fileColumns.collectAsStateWithLifecycle()
-    val rightsCheck by viewModel.rightsCheck.collectAsStateWithLifecycle()
+
 
 
 
@@ -64,32 +64,16 @@ fun AddEditFileScreen(
         }
     }
 
-    LaunchedEffect(saveNewFile){
-        saveBtnClick()
-    }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-    val sucessMsg = stringResource(R.string.success)
-
-    if(rightsCheck!= TransactionCheckStatus.UnCheckedStatus){
-
-        LaunchedEffect(rightsCheck){
-
-            snackbarHostState.showSnackbar(
-                message = if(rightsCheck==TransactionCheckStatus.SuccessStatus) sucessMsg else
-                    "No Success",
-                actionLabel = null
-            )
-            viewModel.addEditFileEvents(AddEditFileEvents.OnRightCheckRefresh)
+    if(saveNewFile){
+        LaunchedEffect(saveNewFile){
+            saveBtnClick()
         }
     }
+
 
     val columnsDialog = remember { mutableStateOf(false) }
 
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(snackbarHostState)
-        },
         floatingActionButton = {
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.primary,
@@ -157,13 +141,6 @@ fun AddEditFileScreen(
                     })
             }
 
-            item{
-                LineTextCard(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = fileInfo.sheetsId
-                )
-            }
-
             item {
                 UrlInputWithCheckbox(
                     modifier = Modifier.fillMaxWidth(),
@@ -207,6 +184,10 @@ fun AddEditFileScreen(
 
             }
 
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             item{
                 Text(
                     text = stringResource(R.string.choose_title_column),
@@ -217,7 +198,7 @@ fun AddEditFileScreen(
                 val title = stringResource(R.string.title)
                 LineClickTextCard(
                     modifier = Modifier.fillMaxWidth(),
-                    text = fileColumns[fileInfo.titleColumnIndex],
+                    text = fileColumns[fileInfo.titleColumnIndex].ifBlank { stringResource(R.string.no_title) },
                     onLineClick = {
                         viewModel.addEditFileEvents(
                             AddEditFileEvents.OnColumnTypeClick(
@@ -265,7 +246,7 @@ fun AddEditFileScreen(
                 val category = stringResource(R.string.category)
                 LineClickTextCard(
                     modifier = Modifier.fillMaxWidth(),
-                    text = fileColumns[fileInfo.categoryColumnIndex],
+                    text = fileColumns[fileInfo.categoryColumnIndex].ifBlank { stringResource(R.string.no_title) },
                     onLineClick = {
                         viewModel.addEditFileEvents(
                             AddEditFileEvents.OnColumnTypeClick(
@@ -312,7 +293,7 @@ fun AddEditFileScreen(
             }
 
             addCards(
-                text = viewModel.addEditFileState.value.newTag,
+                text = addEditFileState.newTag,
                 onTextChanged = { name ->
                     viewModel.addEditFileEvents(
                         AddEditFileEvents.OnNewTagNameChanged(name))
@@ -332,20 +313,20 @@ fun AddEditFileScreen(
 
         if(columnsDialog.value){
             ColumnsDialog(
-                onSaveClick = {
-                    viewModel.addEditFileEvents(AddEditFileEvents.OnSaveDialogClick)
+                onSaveClick = { index ->
+                    viewModel.addEditFileEvents(
+                        AddEditFileEvents.OnSaveDialogClick(
+                            index = index,
+                            columnType = columnsDialogState.columnType
+                    ))
                     columnsDialog.value = false
                 },
                 onCancelClick = {
-                    viewModel.addEditFileEvents(AddEditFileEvents.OnCancelDialogClick)
                     columnsDialog.value = false
                 },
                 columnType = columnsDialogState.columnType,
                 listColumn = fileColumns,
                 selectedIndex = columnsDialogState.selectedIndex,
-                onColumnClick = { index ->
-                    viewModel.addEditFileEvents(AddEditFileEvents.OnColumnDialogClick(index))
-                }
             )
         }
     }

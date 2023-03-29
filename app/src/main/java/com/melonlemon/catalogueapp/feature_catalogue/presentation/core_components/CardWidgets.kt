@@ -2,6 +2,10 @@ package com.melonlemon.catalogueapp.feature_catalogue.presentation.core_componen
 
 import android.graphics.drawable.Icon
 import android.media.Image
+import android.text.TextUtils
+import android.text.method.LinkMovementMethod
+import android.text.util.Linkify
+import android.widget.TextView
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -34,6 +38,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.util.LinkifyCompat
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.melonlemon.catalogueapp.R
@@ -238,14 +244,14 @@ fun RecordSmartCard(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant)
 
                 Text(
-                    text = title,
+                    text = title.ifBlank { stringResource(R.string.no_title) },
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                     textAlign = TextAlign.End
                 )
             }
             Text(
-                text = subHeader,
+                text = subHeader.ifBlank { stringResource(R.string.no_subheader) },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -426,7 +432,9 @@ fun LineClickTextCard(
             color = MaterialTheme.colorScheme.outlineVariant)
     ){
         Row(
-            modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp, horizontal = 16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ){
@@ -460,7 +468,7 @@ fun SelectLineTextCard(
     onCardClick: () -> Unit
 ) {
     Card(
-        modifier = modifier.clickable { onCardClick },
+        modifier = modifier.clickable { onCardClick() },
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent,
         )
@@ -503,12 +511,14 @@ fun MultiTextCard(
 ) {
     var enabled by remember { mutableStateOf(false) }
     Card(
-        modifier = modifier.pointerInput(Unit) {
-            detectTapGestures(
-                onDoubleTap = { enabled = true },
-                onTap = { /* Called on Tap */ }
-            )
-        },
+        modifier = modifier
+            .padding(16.dp)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onDoubleTap = { enabled = true },
+                    onTap = { /* Called on Tap */ }
+                )
+            },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -516,23 +526,41 @@ fun MultiTextCard(
             width = 1.dp,
             color = MaterialTheme.colorScheme.outlineVariant)
     ){
-        Text(
-            modifier = modifier.padding(16.dp),
-            text = title,
-            style = MaterialTheme.typography.headlineSmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Left,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        TextField(
-            value = text,
-            onValueChange = { text ->
-                if( enabled){
-                    onValueChange(text)
-                }
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                modifier = modifier,
+                text = title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Left,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            val mContext = LocalContext.current
+            val mCustomLinkifyText = remember { TextView(mContext) }
+            AndroidView(factory = { mCustomLinkifyText }) { textView ->
+                textView.text = text
+                textView.textSize = 20F
+                textView.isSingleLine = false
+                textView.setEllipsize(TextUtils.TruncateAt.END)
+                LinkifyCompat.addLinks(textView, Linkify.ALL)
+                textView.movementMethod = LinkMovementMethod.getInstance()
             }
-        )
+        }
+
+
+//        TextField(
+//            value = text,
+//            onValueChange = { text ->
+//                if( enabled){
+//                    onValueChange(text)
+//                }
+//            }
+//        )
     }
 }
 
