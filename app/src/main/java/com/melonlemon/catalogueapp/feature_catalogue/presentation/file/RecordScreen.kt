@@ -39,7 +39,7 @@ fun RecordScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(it),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -75,10 +75,9 @@ fun RecordScreen(
             }
             itemsIndexed(selectedRecordFullInfo){ index, columnInfo ->
                 val isDisplayInfo = (index==forRecordsState.titleColumnIndex) || (index == forRecordsState.categoryColumn)
-                val isPhoto = index == forRecordsState.covImgRecordsIndex
-                if(!isDisplayInfo && !isPhoto){
+                if(!isDisplayInfo){
                     MultiTextCard(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                         title = columnsTitles[index].ifBlank { stringResource(R.string.no_title) },
                         text = columnInfo.ifBlank { stringResource(R.string.no_text) },
                         onValueChange = {}

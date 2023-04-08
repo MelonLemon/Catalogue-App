@@ -27,7 +27,7 @@ class AddEditFileViewModel @Inject constructor(
     val authenticationState = _authenticationState.asStateFlow()
 
     private val _fileInfo = MutableStateFlow(Files(
-        id = -1,
+        id = null,
         name="",
         folderId = -1,
         sheetsId = "",
@@ -73,6 +73,13 @@ class AddEditFileViewModel @Inject constructor(
                 _authenticationState.value = authenticationState.value.copy(
                     checkStatusRights = result == ValidationUrlCheckStatus.SuccessStatus,
                 )
+            } else {
+                if(addEditFileState.value.listOfFolders.isNotEmpty()) {
+                    _fileInfo.value = fileInfo.value.copy(
+                        folderId = addEditFileState.value.listOfFolders[0].id
+                    )
+                }
+
             }
 
 
@@ -85,7 +92,6 @@ class AddEditFileViewModel @Inject constructor(
             is AddEditFileEvents.OnNextBtnClick -> {
 
                 if(authenticationState.value.checkStatusRights && _fileInfo.value.numColumns!=0){
-                    if(fileColumns.value.isEmpty()){
                         viewModelScope.launch {
                             val result = useCases.getFirstRow(
                                 sheetsId = fileInfo.value.sheetsId,
@@ -106,8 +112,20 @@ class AddEditFileViewModel @Inject constructor(
                                 _addEditFileState.value = addEditFileState.value.copy(
                                     coverImgCheckStatus = fileInfo.value.coverImg != ""
                                 )
-                                //check columns index in range of column number
-                                //in range stay not in range change to 0 index
+                                val maxIndex = fileInfo.value.numColumns - 1
+                                _fileInfo.value = fileInfo.value.copy(
+                                    titleColumnIndex = if(fileInfo.value.titleColumnIndex > maxIndex)
+                                        0 else fileInfo.value.titleColumnIndex,
+                                    subHeaderColumnIndex = if(fileInfo.value.subHeaderColumnIndex > maxIndex )
+                                        0 else fileInfo.value.subHeaderColumnIndex,
+                                    categoryColumnIndex = if(fileInfo.value.categoryColumnIndex > maxIndex)
+                                        0 else fileInfo.value.categoryColumnIndex,
+                                    covImgRecColumnIndex = if(fileInfo.value.covImgRecColumnIndex != null)
+                                        if(fileInfo.value.categoryColumnIndex > maxIndex)
+                                        0 else fileInfo.value.covImgRecColumnIndex
+                                    else null
+                                )
+
                             } else {
                                 //not success- change
                                 _authenticationState.value = authenticationState.value.copy(
@@ -125,7 +143,7 @@ class AddEditFileViewModel @Inject constructor(
 
 
                         }
-                    }
+
 
                 } else {
                     _authenticationState.value = authenticationState.value.copy(
@@ -213,6 +231,9 @@ class AddEditFileViewModel @Inject constructor(
 
                 _addEditFileState.value = addEditFileState.value.copy(
                     coverImgCheckStatus = event.urlString != ""
+                )
+                _fileInfo.value = fileInfo.value.copy(
+                    coverImg = event.urlString
                 )
             }
             is AddEditFileEvents.OnColumnTypeClick -> {

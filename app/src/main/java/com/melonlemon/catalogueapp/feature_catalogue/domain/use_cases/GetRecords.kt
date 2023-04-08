@@ -53,7 +53,7 @@ class GetRecords(
                         ValidationUrlCheckStatus.BrokenUrlFailStatus
                     }
 
-                    val records =  if(it.values != null) it.values.filter { it[forRecordsState.categoryColumn-1] in forRecordsState.listOfSelectedCategories}
+                    val records =  if(it.values != null) it.values.filter { it[forRecordsState.categoryColumn] in forRecordsState.listOfSelectedCategories}
                     else null
                     RecordsResult(
                         records = records,

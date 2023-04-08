@@ -63,12 +63,12 @@ fun FileScreen(
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 BackArrowRow(
-                    modifier = Modifier.weight(0.7f),
+                    modifier = Modifier.weight(0.8f),
                     onArrowBackClick = backBtnClick,
                     title = fileInfoState.title
                 )
                 IconButton(
-                    modifier = Modifier.weight(0.3f),
+                    modifier = Modifier.weight(0.2f),
                     onClick = { onEditClick(forRecordsState.fileId) },
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = MaterialTheme.colorScheme.background,
@@ -96,7 +96,7 @@ fun FileScreen(
             )
             Spacer(modifier = Modifier.width(8.dp))
 
-            if(isDownloading){
+            if(isDownloading || listOfRecords.validationUrlCheckStatus == ValidationUrlCheckStatus.UnCheckedStatus){
                 Box(modifier = Modifier.fillMaxWidth()) {
                     CircularProgressIndicator(
                         modifier = Modifier.align(Alignment.Center)

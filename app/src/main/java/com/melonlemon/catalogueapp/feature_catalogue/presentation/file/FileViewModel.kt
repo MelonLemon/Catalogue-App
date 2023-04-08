@@ -56,7 +56,9 @@ class FileViewModel @Inject constructor(
         if(listOfRecords.records!=null){
             val records = useCases.getFilteredList(
                 listCards = listOfRecords.records,
-                searchText = searchText
+                searchText = searchText,
+                titleIndex = forRecordsState.value.titleColumnIndex,
+                categoryIndex = forRecordsState.value.categoryColumn
             )
             listOfRecords.copy(
                 records = records
@@ -103,6 +105,9 @@ class FileViewModel @Inject constructor(
                     title = title?:"",
                     listOfCategories = listCategories
                 )
+
+            } else {
+                // error
             }
         }
 

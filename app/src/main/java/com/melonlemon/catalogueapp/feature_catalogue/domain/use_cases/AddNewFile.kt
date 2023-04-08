@@ -8,6 +8,6 @@ class AddNewFile(
     private val repository: CatalogueRepository
 ) {
     suspend operator fun invoke(file: Files){
-        repository.addNewFile(file)
+        repository.addNewFile(file.copy(id=null))
     }
 }

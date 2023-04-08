@@ -47,47 +47,47 @@ class DatabaseInitializer(
         catalogueProvider.get().addFile(
             Files(
                 id=0,
-                name="Music for sleep",
+                name="Youtube Music Artists",
                 folderId = 1,
                 sheetsId = "1ZLxdPbjzrA-lDLjVuYvvsu_zFdIzlwPxymD-qZtvOr4",
-                sheetsName = "Meditation Music",
-                numColumns = 4,
+                sheetsName = "Top Youtube Artists",
+                numColumns = 13,
                 titleColumnIndex = 0,
-                subHeaderColumnIndex = 3,
-                categoryColumnIndex = 2,
-                covImgRecColumnIndex = 1,
-                coverImg = "https://images.unsplash.com/photo-1444312645910-ffa973656eba?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80",
-                tags = listOf("Meditation", "Music")
+                subHeaderColumnIndex = 10,
+                categoryColumnIndex = 12,
+                covImgRecColumnIndex = 4,
+                coverImg = "https://images.unsplash.com/photo-1458560871784-56d23406c091?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1074&q=80",
+                tags = listOf("Youtube", "Music")
             )
         )
         catalogueProvider.get().addFile(
             Files(
                 id=1,
-                name="Korean Food",
-                folderId = 3,
+                name="Tv-series and Shows",
+                folderId = 2,
                 sheetsId = "1BSJ0-8dWzSM-TUBeNp-KYGFs5uTmJ4WPIsW3ENdvxqQ",
-                sheetsName = "korean food",
-                numColumns = 4,
+                sheetsName = "Tv-series",
+                numColumns = 10,
                 titleColumnIndex = 0,
-                subHeaderColumnIndex = 3,
-                categoryColumnIndex = 3,
-                covImgRecColumnIndex = 1,
-                coverImg = "https://images.unsplash.com/photo-1590301157890-4810ed352733?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=736&q=80",
-                tags = listOf("Korea", "Food")
+                subHeaderColumnIndex = 5,
+                categoryColumnIndex = 6,
+                covImgRecColumnIndex = 2,
+                coverImg = "https://images.unsplash.com/photo-1586899028174-e7098604235b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1742&q=80",
+                tags = listOf("Tv-series")
             )
         )
         catalogueProvider.get().addFile(
             Files(
                 id=2,
-                name="Nasa",
+                name="Astronomy Picture of the Day",
                 folderId = 3,
                 sheetsId = "1N-tIjv34uIOEosAExNkkSWCd9n--ybTVpgOxiHeGoZE",
-                sheetsName = "Сoaster for a cup",
-                numColumns = 3,
-                titleColumnIndex = 0,
-                subHeaderColumnIndex = 1,
-                categoryColumnIndex = 1,
-                covImgRecColumnIndex = 2,
+                sheetsName = "Astronomy Picture of the Day",
+                numColumns = 5,
+                titleColumnIndex = 1,
+                subHeaderColumnIndex = 0,
+                categoryColumnIndex = 2,
+                covImgRecColumnIndex = 3,
                 coverImg = "https://images.unsplash.com/photo-1484589065579-248aad0d8b13?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=759&q=80",
                 tags = listOf("Photo", "Space")
             )

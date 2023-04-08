@@ -106,7 +106,7 @@ fun SmartCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp),
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.SpaceBetween
             ){
                 Icon(
@@ -117,7 +117,10 @@ fun SmartCard(
                 Text(
                     text = title,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.End,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
 
@@ -247,10 +250,13 @@ fun RecordSmartCard(
                     text = title.ifBlank { stringResource(R.string.no_title) },
                     color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.End
+                    textAlign = TextAlign.End,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Text(
+                modifier = Modifier.padding(end = 12.dp),
                 text = subHeader.ifBlank { stringResource(R.string.no_subheader) },
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.bodyMedium
@@ -512,7 +518,6 @@ fun MultiTextCard(
     var enabled by remember { mutableStateOf(false) }
     Card(
         modifier = modifier
-            .padding(16.dp)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onDoubleTap = { enabled = true },

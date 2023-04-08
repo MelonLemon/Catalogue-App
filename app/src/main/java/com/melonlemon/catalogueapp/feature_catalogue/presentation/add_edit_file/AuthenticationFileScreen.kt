@@ -59,6 +59,7 @@ fun AuthenticationFileScreen(
 
         LaunchedEffect(rightsCheck){
 
+
             snackbarHostState.showSnackbar(
                 message = errorMessagesUrl[rightsCheck]?: errorStatus,
                 actionLabel = null
@@ -72,10 +73,12 @@ fun AuthenticationFileScreen(
         LaunchedEffect(authenticationState.authenticationStatus){
 
             val authenticationStatus = authenticationState.authenticationStatus
-            snackbarHostState.showSnackbar(
-                message = errorMessages[authenticationState.authenticationStatus]?: errorStatus,
-                actionLabel = null
-            )
+            if(authenticationState.authenticationStatus != AuthenticationStatus.SuccessStatus){
+                snackbarHostState.showSnackbar(
+                    message = errorMessages[authenticationState.authenticationStatus]?: errorStatus,
+                    actionLabel = null
+                )
+            }
             viewModel.addEditFileEvents(AddEditFileEvents.AuthenticationStatusRefresh)
 
             if(authenticationStatus == AuthenticationStatus.SuccessStatus){

@@ -52,3 +52,6 @@ data class RecordsResult(
     val records: List<List<String>>?,
     val validationUrlCheckStatus: ValidationUrlCheckStatus
 )
+
+
+
