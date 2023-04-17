@@ -111,7 +111,7 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(it),
+                .padding(it).padding(top=16.dp, start=16.dp, end=16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -134,7 +134,7 @@ fun HomeScreen(
             ) {
                 LazyRow(
                     modifier = Modifier.weight(1f),
-                    contentPadding = PaddingValues(horizontal = 8.dp)
+                    contentPadding = PaddingValues(horizontal = 4.dp)
                 ){
                     item{
                         BasicButton(

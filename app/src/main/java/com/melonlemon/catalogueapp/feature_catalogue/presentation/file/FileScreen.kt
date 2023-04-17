@@ -52,7 +52,7 @@ fun FileScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(it),
+                .padding(it).padding(start=16.dp, end=16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -129,7 +129,8 @@ fun FileScreen(
                     LazyRow(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
+                        horizontalArrangement = Arrangement.Start,
+                        contentPadding = PaddingValues(horizontal = 4.dp)
                     ){
                         item{
                             BasicButton(

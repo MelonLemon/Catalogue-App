@@ -38,7 +38,7 @@ fun RecordScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(it),
+                .padding(it).padding(start=16.dp, end=16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

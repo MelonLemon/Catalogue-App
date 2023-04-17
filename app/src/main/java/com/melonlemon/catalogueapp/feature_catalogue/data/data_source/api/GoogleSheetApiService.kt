@@ -13,13 +13,6 @@ interface GoogleSheetApiService {
         @Path("range") range:String,
         @Query("key") apiKey: String): FileObject
 
-    @GET("spreadsheets/{spreadsheetId}/values/'{sheetsName}'!A1:{columnLetter}?majorDimension=ROWS&")
-    suspend fun getPagingAllRecords(
-        @Path("spreadsheetId") spreadsheetId:String,
-        @Path("sheetsName") sheetsName:String,
-        @Path("columnLetter") columnLetter:String,
-        @Query("key") apiKey: String): FileObject
-
 
     @GET("spreadsheets/{spreadsheetId}/values/'{sheetsName}'!A1:A1?majorDimension=ROWS&")
     suspend fun getFirstCell(
