@@ -13,13 +13,13 @@ It has pre-populated data with information about 3 sample google sheets for demo
 ## Screenshots
 
 <p float="middle">
-  <img src="" width="100" />
-  <img src="" width="100" /> 
-  <img src="" width="100" />
+  <img src="https://user-images.githubusercontent.com/26432711/232549630-2e53f25b-9dd2-46bb-acc0-e8948d4e2f25.png" width="100" />
+  <img src="https://user-images.githubusercontent.com/26432711/232549650-3125ce00-f23c-4857-a880-aedf5737735c.png" width="100" /> 
+  <img src="https://user-images.githubusercontent.com/26432711/232549658-b7437503-84a1-4fd3-ba74-02632bed3b74.png" width="100" />
 </p>
 
-*Google Sheets is a file 
-**Record is a Single Row in google sheet
+* Google Sheets is a file 
+** Record is a Single Row in google sheet
 
 ## Features
 
