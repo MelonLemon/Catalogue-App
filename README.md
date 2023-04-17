@@ -13,9 +13,9 @@ It has pre-populated data with information about 3 sample google sheets for demo
 ## Screenshots
 
 <p float="middle">
-  <img src="/screenshot_home.png" width="100" />
-  <img src="/screenshot_file.png" width="100" /> 
-  <img src="/screenshot_record.png" width="100" />
+  <img src="/Screenshot_20230417_181654.png" width="100" />
+  <img src="/Screenshot_20230417_181732.png" width="100" /> 
+  <img src="/Screenshot_20230417_181825.png" width="100" />
 </p>
 
 *Google Sheets is a file 
