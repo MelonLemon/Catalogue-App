@@ -6,9 +6,9 @@ You can specify other atributers for view display as title columns, categories a
 
 App was build with **Jetpack Compose**, using **Hilt** and **Retrofit**, **Room**. 
 It has pre-populated data with information about 3 sample google sheets for demonstration:
-- **NASA** - Astronomy Picture of the Day - for first 3 month of 2023 - Google Sheet has JavaScript scripts of using **NASA Api** to retrieve information.
-- **Youtube Music** - Top 100 Youtube Artists - Google Sheet has JavaScript scripts of using **Youtube Api** to retrieve information about streams, mvs. 
-- **Tv-series and Shows** - personal collection of tv-series and shows.
+- [**NASA**](https://docs.google.com/spreadsheets/d/1N-tIjv34uIOEosAExNkkSWCd9n--ybTVpgOxiHeGoZE/edit) - Astronomy Picture of the Day - for first 3 month of 2023 - Google Sheet has JavaScript scripts of using **NASA Api** to retrieve information.
+- [**Youtube Music**](https://docs.google.com/spreadsheets/d/1ZLxdPbjzrA-lDLjVuYvvsu_zFdIzlwPxymD-qZtvOr4/edit?usp=drive_web&ouid=102505950928311293331) - Top 100 Youtube Artists - Google Sheet has JavaScript scripts of using **Youtube Api** to retrieve information about streams, mvs. 
+- [**Tv-series and Shows**](https://docs.google.com/spreadsheets/d/1BSJ0-8dWzSM-TUBeNp-KYGFs5uTmJ4WPIsW3ENdvxqQ/edit) - personal collection of tv-series and shows.
 
 ## Screenshots
 
