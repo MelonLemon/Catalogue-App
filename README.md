@@ -1,23 +1,23 @@
 # Catalogue-App
 
-**Catalogue App** is a catalogue App that shows google sheets data with taking single row as a single record. 
+**Catalogue App** shows google sheets data with taking single row as a single record. 
 You can add public google sheets by specifiyng their sheets id, sheets name. 
 You can specify other atributers for view display as title columns, categories and tags and so on. 
 
 App was build with **Jetpack Compose**, using **Hilt** and **Retrofit**, **Room**. 
 It has pre-populated data with information about 3 sample google sheets for demonstration:
-- **NASA** - Astronomy Picture of the Day - for first 3 month of 2023 - Google Sheet has JavaScript scripts of using NASA Api to retrieve information.
-- **Youtube Music** - Top 100 Youtube Artists - Google Sheet has JavaScript scripts of using Youtube Api to retrieve information about streams, mvs. 
+- **NASA** - Astronomy Picture of the Day - for first 3 month of 2023 - Google Sheet has JavaScript scripts of using **NASA Api** to retrieve information.
+- **Youtube Music** - Top 100 Youtube Artists - Google Sheet has JavaScript scripts of using **Youtube Api** to retrieve information about streams, mvs. 
 - **Tv-series and Shows** - personal collection of tv-series and shows.
 
-##Screenshots
+## Screenshots
 
 
 
 *Google Sheets is a file 
 **Record is a Single Row in google sheet
 
-##Features
+## Features
 
 - **Home** where you can see all your files* by folders with implemented search. Clicking Folder icon takes to **Folder Screen** that 
 shares viewmodel with **Home Screen**. You can add new folders and delete folders except folder "Others". If in deleted folder there were files 
