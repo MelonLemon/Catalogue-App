@@ -68,4 +68,5 @@
     <string name="no_category">No Category</string>
     <string name="record_empty">Record is empty!</string>
     <string name="no_text">No Text</string>
+    <string name="unchecked">Unchecked!</string>
 </resources>

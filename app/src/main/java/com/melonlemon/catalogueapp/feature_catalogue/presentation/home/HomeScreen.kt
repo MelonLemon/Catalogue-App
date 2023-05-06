@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -47,20 +48,15 @@ fun HomeScreen(
     val deleteState by viewModel.deleteState.collectAsStateWithLifecycle()
     val isDownloading by viewModel.isDownloading.collectAsStateWithLifecycle()
 
-    val errorMessages = mapOf(
-        TransactionCheckStatus.BlankParameterFailStatus to stringResource(R.string.empty_name),
-        TransactionCheckStatus.SuccessStatus to stringResource(R.string.success),
-        TransactionCheckStatus.UnKnownFailStatus to  stringResource(R.string.unknown_error)
-    )
-    val errorStatus = stringResource(R.string.unknown_error)
     val density = LocalDensity.current
+    val context = LocalContext.current
 
     if(deleteState.deleteCheckStatus!= TransactionCheckStatus.UnCheckedStatus){
 
         LaunchedEffect(deleteState.deleteCheckStatus){
 
             snackbarHostState.showSnackbar(
-                message = errorMessages[deleteState.deleteCheckStatus]?: errorStatus,
+                message = context.resources.getString(deleteState.deleteCheckStatus.message),
                 actionLabel = null,
                 duration = SnackbarDuration.Short
             )
